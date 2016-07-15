@@ -255,7 +255,18 @@ function stopbutton_Callback(hObject, eventdata, handles)
     %Clear the plot when the figure closes...
     %Add Different booleans to prevent errors
     %TODO: There are a lot of things
+    
 end
-
+%Testing Strategy:
+%Relentless trial by use**
+%   1. Order in which Buttons are pushed
+%       1. Repeats 
+%         - start, start
+%         - end, end
+%       2. What Button is clicked First
+%         - Start
+%         - End
+%         - Close Window
+%         - make visible
 
 
