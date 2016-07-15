@@ -258,23 +258,4 @@ function stopbutton_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in clearGraph.
-function clearGraph_Callback(hObject, eventdata, handles)
-% hObject    handle to clearGraph (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    global uPlotSensor1;
-    global uPlotSensor2;
-    global uPlotSensor3;
-    global uPlotSensor4;
-    global uPlotSensor5;
-    global uPlotSensor6;
-    global xcounter;
-    xcounter = 0;
-    clearpoints(uPlotSensor1);
-    clearpoints(uPlotSensor2);
-    clearpoints(uPlotSensor3);
-    clearpoints(uPlotSensor4);
-    clearpoints(uPlotSensor5);
-    clearpoints(uPlotSensor6);
-end
+
