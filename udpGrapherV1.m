@@ -22,7 +22,7 @@ function varargout = udpGrapherV1(varargin)
 
 % Edit the above text to modify the response to help udpGrapherV1
 
-% Last Modified by GUIDE v2.5 15-Jul-2016 16:28:06
+% Last Modified by GUIDE v2.5 25-Jul-2016 18:12:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,6 +63,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     xcounter = 0;
     countToClearBuffer = 0;    
     secondsBetweenFlushes = 10;
+    
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
 
@@ -135,6 +136,11 @@ function checkbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox1
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+else
+    %we received a one
+end
 end
 
 % --- Executes on button press in checkbox2.
@@ -162,6 +168,8 @@ function checkbox4_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox4
+%Check box = 1 if checked == 0 if not checked
+%TODO:  Need to see if it is possible to precheck the check boxes
 end
 
 % --- Executes on button press in checkbox5.
@@ -257,6 +265,7 @@ function stopbutton_Callback(hObject, eventdata, handles)
     %TODO: There are a lot of things
     
 end
+
 %Testing Strategy:
 %Relentless trial by use**
 %   1. Order in which Buttons are pushed
@@ -270,3 +279,54 @@ end
 %         - make visible
 
 
+% --- Executes during object creation, after setting all properties.
+function checkbox1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+% --- Executes during object creation, after setting all properties.
+function checkbox2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
