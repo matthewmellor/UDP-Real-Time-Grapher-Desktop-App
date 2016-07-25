@@ -136,10 +136,13 @@ function checkbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox1
+global uPlotSensor1;
 if(get(hObject, 'Value') == 0)
   %Set plot 1 to be invisible
+  set(uPlotSensor1,'Visible','off');
 else
     %we received a one
+    set(uPlotSensor1, 'Visible', 'on');
 end
 end
 
@@ -150,6 +153,14 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox2
+global uPlotSensor2;
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+  set(uPlotSensor2,'Visible','off');
+else
+    %we received a one
+    set(uPlotSensor2, 'Visible', 'on');
+end
 end
 
 % --- Executes on button press in checkbox3.
@@ -159,6 +170,14 @@ function checkbox3_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox3
+global uPlotSensor3;
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+  set(uPlotSensor3,'Visible','off');
+else
+    %we received a one
+    set(uPlotSensor3, 'Visible', 'on');
+end
 end
 
 % --- Executes on button press in checkbox4.
@@ -170,6 +189,14 @@ function checkbox4_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox4
 %Check box = 1 if checked == 0 if not checked
 %TODO:  Need to see if it is possible to precheck the check boxes
+global uPlotSensor4;
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+  set(uPlotSensor4,'Visible','off');
+else
+    %we received a one
+    set(uPlotSensor4, 'Visible', 'on');
+end
 end
 
 % --- Executes on button press in checkbox5.
@@ -179,6 +206,14 @@ function checkbox5_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox5
+global uPlotSensor5;
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+  set(uPlotSensor5,'Visible','off');
+else
+    %we received a one
+    set(uPlotSensor5, 'Visible', 'on');
+end
 end
 
 % --- Executes on button press in checkbox6.
@@ -188,6 +223,14 @@ function checkbox6_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox6
+global uPlotSensor6;
+if(get(hObject, 'Value') == 0)
+  %Set plot 1 to be invisible
+  set(uPlotSensor6,'Visible','off');
+else
+    %we received a one
+    set(uPlotSensor6, 'Visible', 'on');
+end
 end
 
 function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6, bytesToRead)
@@ -263,7 +306,6 @@ function stopbutton_Callback(hObject, eventdata, handles)
     %Clear the plot when the figure closes...
     %Add Different booleans to prevent errors
     %TODO: There are a lot of things
-    
 end
 
 %Testing Strategy:
