@@ -119,8 +119,8 @@ function startbutton_Callback(hObject, eventdata, handles)
 
         t1 = clock; %Get the first clock value
         fopen(udpClient); 
-        pause(3);
         fprintf(udpClient, 'Connection made.');
+        pause(3);
     end
 end
 
@@ -218,6 +218,17 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
         fclose(instrfindall); %Is this necessary?? TODO
     end
 end
+
+
+
+
+
+
+%%----CheckBox Code ------
+
+
+
+
 
 % --- Executes during object creation, after setting all properties.
 function checkbox1_CreateFcn(hObject, eventdata, handles)
