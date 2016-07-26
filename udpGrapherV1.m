@@ -459,7 +459,7 @@ function checkbox6_Callback(hObject, eventdata, handles)
     global checkBox6Visible; 
     checkBox6 = get(hObject, 'Value');
     
-    if(checkBox6 == 0)
+    if(checkBox6 == 0)  %This to update the state so start callback will be accurate
         checkBox6Visible = 'off';
     else
         checkBox6Visible = 'on';
