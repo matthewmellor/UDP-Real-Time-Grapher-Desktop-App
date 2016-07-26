@@ -1,29 +1,4 @@
 function varargout = udpGrapherV1(varargin)
-% UDPGRAPHERV1 MATLAB code for udpGrapherV1.fig
-%      UDPGRAPHERV1, by itself, creates a new UDPGRAPHERV1 or raises the existing
-%      singleton*.
-%
-%      H = UDPGRAPHERV1 returns the handle to a new UDPGRAPHERV1 or the handle to
-%      the existing singleton*.
-%
-%      UDPGRAPHERV1('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in UDPGRAPHERV1.M with the given input arguments.
-%
-%      UDPGRAPHERV1('Property','Value',...) creates a new UDPGRAPHERV1 or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before udpGrapherV1_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to udpGrapherV1_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
-% Edit the above text to modify the response to help udpGrapherV1
-
-% Last Modified by GUIDE v2.5 25-Jul-2016 18:12:37
-
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
@@ -55,14 +30,17 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global numDataSetsInPacket;
     global xcounter;
     global countToClearBuffer;
-  
     global secondsBetweenFlushes;
+    global startBeenPressed;
+    global everStarted;
   
     xlimit = 5000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
     xcounter = 0;
     countToClearBuffer = 0;    
     secondsBetweenFlushes = 10;
+    startBeenPressed = false;
+    everStarted = false;
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -92,41 +70,49 @@ function startbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %This is the start button so we want to do alot here....
-global t1;
-global xlimit;
-global numDataSetsInPacket;
-global udpClient;
-global uPlotSensor1;
-global uPlotSensor2;
-global uPlotSensor3;
-global uPlotSensor4;
-global uPlotSensor5;
-global uPlotSensor6;
-
-udpClient = udp('footsensor1.dynamic-dns.net',2390, 'LocalPort', 5000);
-flushinput(udpClient);
-%Add more plots here to window if necessary
-
-    uPlotSensor1 = animatedline('Color','g', 'MaximumNumPoints', xlimit);
-    uPlotSensor2 = animatedline('Color','r', 'MaximumNumPoints', xlimit);
-    uPlotSensor3 = animatedline('Color','b', 'MaximumNumPoints', xlimit);
-    uPlotSensor4 = animatedline('Color','y', 'MaximumNumPoints', xlimit);
-    uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit);
-    uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit);
+    global t1;
+    global xlimit;
+    global numDataSetsInPacket;
+    global udpClient;
+    global uPlotSensor1;
+    global uPlotSensor2;
+    global uPlotSensor3;
+    global uPlotSensor4;
+    global uPlotSensor5;
+    global uPlotSensor6;
+    global startBeenPressed;
+    global everStarted;
     
-%Need to add more to get this to work?
-%Where do I put local read an plot???
-%Setup Udp object
-    bytesToRead = (numDataSetsInPacket -1) * 30 + (32); %Reflects length of message recieved may need to be changed
-    udpClient.BytesAvailableFcn = {@localReadAndPlot,uPlotSensor1, uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6,bytesToRead};
-    udpClient.BytesAvailableFcnMode = 'byte';
-    udpClient.BytesAvailableFcnCount = bytesToRead;
-    udpClient.InputBufferSize = 1000000;
+    if(~startBeenPressed) %I think there needs to be more here
+        startBeenPressed = true;
+        everStarted = true;
+        udpClient = udp('footsensor1.dynamic-dns.net',2390, 'LocalPort', 5000);
+        flushinput(udpClient);
     
-    t1 = clock; %Get the first clock value
-    fopen(udpClient); 
-    pause(3);
-    fprintf(udpClient, 'Connection made.');
+    
+       %Add more plots here to window if necessary
+
+        uPlotSensor1 = animatedline('Color','g', 'MaximumNumPoints', xlimit);
+        uPlotSensor2 = animatedline('Color','r', 'MaximumNumPoints', xlimit);
+        uPlotSensor3 = animatedline('Color','b', 'MaximumNumPoints', xlimit);
+        uPlotSensor4 = animatedline('Color','y', 'MaximumNumPoints', xlimit);
+        uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit);
+        uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit);
+
+        %Need to add more to get this to work?
+        %Where do I put local read an plot???
+        %Setup Udp object
+        bytesToRead = (numDataSetsInPacket -1) * 30 + (32); %Reflects length of message recieved may need to be changed
+        udpClient.BytesAvailableFcn = {@localReadAndPlot,uPlotSensor1, uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6,bytesToRead};
+        udpClient.BytesAvailableFcnMode = 'byte';
+        udpClient.BytesAvailableFcnCount = bytesToRead;
+        udpClient.InputBufferSize = 1000000;
+
+        t1 = clock; %Get the first clock value
+        fopen(udpClient); 
+        pause(3);
+        fprintf(udpClient, 'Connection made.');
+    end
 end
 
 % --- Executes on button press in checkbox1.
@@ -136,14 +122,17 @@ function checkbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox1
-global uPlotSensor1;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor1,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor1, 'Visible', 'on');
-end
+    global uPlotSensor1;
+    global startBeenPressed;
+    if(startBeenPressed)
+        if(get(hObject, 'Value') == 0)
+          %Set plot 1 to be invisible
+          set(uPlotSensor1,'Visible','off');
+        else
+            %we received a one
+            set(uPlotSensor1, 'Visible', 'on');
+        end
+    end
 end
 
 % --- Executes on button press in checkbox2.
@@ -153,14 +142,17 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox2
-global uPlotSensor2;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor2,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor2, 'Visible', 'on');
-end
+    global uPlotSensor2;
+    global startBeenPressed;
+    if(startBeenPressed)
+        if(get(hObject, 'Value') == 0)
+          %Set plot 1 to be invisible
+          set(uPlotSensor2,'Visible','off');
+        else
+            %we received a one
+            set(uPlotSensor2, 'Visible', 'on');
+        end
+    end
 end
 
 % --- Executes on button press in checkbox3.
@@ -170,14 +162,17 @@ function checkbox3_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox3
-global uPlotSensor3;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor3,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor3, 'Visible', 'on');
-end
+    global startBeenPressed;
+    global uPlotSensor3;
+    if(startBeenPressed)
+        if(get(hObject, 'Value') == 0)
+          %Set plot 1 to be invisible
+          set(uPlotSensor3,'Visible','off');
+        else
+            %we received a one
+            set(uPlotSensor3, 'Visible', 'on');
+        end
+    end
 end
 
 % --- Executes on button press in checkbox4.
@@ -189,14 +184,17 @@ function checkbox4_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox4
 %Check box = 1 if checked == 0 if not checked
 %TODO:  Need to see if it is possible to precheck the check boxes
-global uPlotSensor4;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor4,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor4, 'Visible', 'on');
-end
+    global uPlotSensor4;
+    global startBeenPressed;
+    if(startBeenPressed)
+        if(get(hObject, 'Value') == 0)
+          %Set plot 1 to be invisible
+          set(uPlotSensor4,'Visible','off');
+        else
+            %we received a one
+            set(uPlotSensor4, 'Visible', 'on');
+        end
+    end
 end
 
 % --- Executes on button press in checkbox5.
@@ -206,14 +204,17 @@ function checkbox5_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox5
-global uPlotSensor5;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor5,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor5, 'Visible', 'on');
-end
+    global uPlotSensor5;
+    global startBeenPressed;
+    if(startBeenPressed)
+        if(get(hObject, 'Value') == 0)
+          %Set plot 1 to be invisible
+          set(uPlotSensor5,'Visible','off');
+        else
+            %we received a one
+            set(uPlotSensor5, 'Visible', 'on');
+        end
+    end
 end
 
 % --- Executes on button press in checkbox6.
@@ -223,14 +224,17 @@ function checkbox6_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox6
-global uPlotSensor6;
-if(get(hObject, 'Value') == 0)
-  %Set plot 1 to be invisible
-  set(uPlotSensor6,'Visible','off');
-else
-    %we received a one
-    set(uPlotSensor6, 'Visible', 'on');
-end
+    global uPlotSensor6;
+    global startBeenPressed;
+    if(startBeenPressed)
+            if(get(hObject, 'Value') == 0)
+              %Set plot 1 to be invisible
+              set(uPlotSensor6,'Visible','off');
+            else
+                %we received a one
+                set(uPlotSensor6, 'Visible', 'on');
+            end
+    end
 end
 
 function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6, bytesToRead)
@@ -297,28 +301,20 @@ function stopbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     global udpClient;
     global xcounter;
-    xcounter = 0;
-    flushinput(udpClient);
-    fclose(udpClient);
-    delete(udpClient);
-    clear udpClient;
-    fclose(instrfindall);
-    %Clear the plot when the figure closes...
-    %Add Different booleans to prevent errors
-    %TODO: There are a lot of things
+    global startBeenPressed;
+    if(startBeenPressed)
+        startBeenPressed = false;
+        xcounter = 0;
+        flushinput(udpClient);
+        fclose(udpClient);
+        delete(udpClient);
+        clear udpClient;
+        fclose(instrfindall);
+        %Clear the plot when the figure closes...
+        %Add Different booleans to prevent errors
+        %TODO: There are a lot of things
+    end
 end
-
-%Testing Strategy:
-%Relentless trial by use**
-%   1. Order in which Buttons are pushed
-%       1. Repeats 
-%         - start, start
-%         - end, end
-%       2. What Button is clicked First
-%         - Start
-%         - End
-%         - Close Window
-%         - make visible
 
 
 % --- Executes during object creation, after setting all properties.
@@ -371,4 +367,23 @@ function checkbox6_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
+end
+
+
+% --- Executes during object deletion, before destroying properties.
+function figure1_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global udpClient;
+    global xcounter;
+    global startBeenPressed;
+    global everStarted;
+    if(startBeenPressed && everStarted) %This means there is still a udp connection
+        flushinput(udpClient);
+        fclose(udpClient);
+        delete(udpClient);
+        clear udpClient;
+        fclose(instrfindall);
+    end
 end
