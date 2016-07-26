@@ -52,6 +52,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global checkBox4Visible;
     global checkBox5Visible;
     global checkBox6Visible;
+    
   
     xlimit = 5000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -103,6 +104,9 @@ function startbutton_Callback(hObject, eventdata, handles)
     global checkBox4Visible;
     global checkBox5Visible;
     global checkBox6Visible;
+    global remoteHostName;
+    global remotePort;
+    global localPort;
     
     if(~startBeenPressed) %I think there needs to be more here
         if(stopBeenPressed)
@@ -116,9 +120,10 @@ function startbutton_Callback(hObject, eventdata, handles)
             clearpoints(uPlotSensor5);
             clearpoints(uPlotSensor6);
         end
+        
         startBeenPressed = true;
         everStarted = true;
-        udpClient = udp('footsensor1.dynamic-dns.net',2390, 'LocalPort', 5000);
+        udpClient = udp(remoteHostName, remotePort, 'LocalPort', localPort);
         flushinput(udpClient);
     
     
@@ -243,11 +248,7 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
 end
 
 
-
-
-
-
-%%----CheckBox Code ------
+%%-----------------------CheckBox Code ------------------------------
 
 % --- Executes during object creation, after setting all properties.
 function checkbox1_CreateFcn(hObject, eventdata, handles)
@@ -476,8 +477,6 @@ function checkbox6_Callback(hObject, eventdata, handles)
     end
 end
 
-
-% --------------------------------------------------------------------
 function file_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to file_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -485,7 +484,6 @@ function file_menu_Callback(hObject, eventdata, handles)
 end
 
 
-% --------------------------------------------------------------------
 function udp_properties_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to udp_properties_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -494,7 +492,6 @@ function udp_properties_menu_Callback(hObject, eventdata, handles)
 end
 
 
-% --------------------------------------------------------------------
 function graph_properties_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to graph_properties_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -502,8 +499,6 @@ function graph_properties_menu_Callback(hObject, eventdata, handles)
     %We want to bring up an input Dialog
 end
 
-
-% --------------------------------------------------------------------
 function export_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to export_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -511,7 +506,6 @@ function export_menu_Callback(hObject, eventdata, handles)
 end
 
 
-% --------------------------------------------------------------------
 function properties_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to properties_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -526,85 +520,101 @@ function excel_menu_Callback(hObject, eventdata, handles)
 end
 
 
-
-function edit1_Callback(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+%----------------UDP Parameters--------------------------------------------
+function HostIPEditField_Callback(hObject, eventdata, handles)
+% hObject    handle to HostIPEditField (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit1 as text
-%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+% Hints: get(hObject,'String') returns contents of HostIPEditField as text
+%        str2double(get(hObject,'String')) returns contents of HostIPEditField as a double
+    global remoteHostName;
+    remoteHostName = get(hObject,'String');
 end
 
 
 % --- Executes during object creation, after setting all properties.
-function edit1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function HostIPEditField_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to HostIPEditField (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    global remoteHostName;
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+    remoteHostName = get(hObject,'String');
 end
 
 
 
 % --- Executes on button press in pushbutton5.
-function pushbutton4_Callback(hObject, eventdata, handles)
+function setButton_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-disp('Pushed set');
+    %Check to see what the remote port and local port and other are valid
+    
 end
 
 
 
-function edit2_Callback(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function RemotePortEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to RemotePortEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit2 as text
-%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+% Hints: get(hObject,'String') returns contents of RemotePortEdit as text
+%        str2double(get(hObject,'String')) returns contents of RemotePortEdit as a double
+    global remotePort;
+    remotePort = str2double(get(hObject,'String'));
 end
 
 
 % --- Executes during object creation, after setting all properties.
-function edit2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function RemotePortEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to RemotePortEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    global remotePort;
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+    remotePort = str2double(get(hObject,'String'));
 end
 
 
-function edit3_Callback(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function LocalPortEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to LocalPortEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit3 as text
-%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+% Hints: get(hObject,'String') returns contents of LocalPortEdit as text
+%        str2double(get(hObject,'String')) returns contents of LocalPortEdit as a double
+ %Set the value of the local port to whatever it is now
+ %Global variable
+ %Need to check if the 
+    global localPort;
+    localPort = str2double(get(hObject,'String'));
 end
 
 
 % --- Executes during object creation, after setting all properties.
-function edit3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function LocalPortEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LocalPortEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+    global localPort;
+    localPort = str2double(get(hObject,'String'));
 end
