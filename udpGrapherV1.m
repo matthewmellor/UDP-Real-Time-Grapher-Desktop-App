@@ -91,7 +91,12 @@ function startbutton_Callback(hObject, eventdata, handles)
             %Clear the axes...
             %How to clear the axes
             stopBeenPressed = false;
-            %TODO
+            clearpoints(uPlotSensor1);
+            clearpoints(uPlotSensor2);
+            clearpoints(uPlotSensor3);
+            clearpoints(uPlotSensor4);
+            clearpoints(uPlotSensor5);
+            clearpoints(uPlotSensor6);
         end
         startBeenPressed = true;
         everStarted = true;
