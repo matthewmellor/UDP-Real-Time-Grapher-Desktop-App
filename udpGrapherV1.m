@@ -46,6 +46,12 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global startBeenPressed;
     global everStarted;
     global stopBeenPressed;
+    global checkBox1Visible;
+    global checkBox2Visible;
+    global checkBox3Visible;
+    global checkBox4Visible;
+    global checkBox5Visible;
+    global checkBox6Visible;
   
     xlimit = 5000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -55,6 +61,12 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     startBeenPressed = false;
     everStarted = false;
     stopBeenPressed = false;
+    checkBox1Visible = 'on';
+    checkBox2Visible = 'on';
+    checkBox3Visible = 'on';
+    checkBox4Visible = 'on';
+    checkBox5Visible = 'on';
+    checkBox6Visible = 'on';
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -85,6 +97,12 @@ function startbutton_Callback(hObject, eventdata, handles)
     global startBeenPressed;
     global everStarted;
     global stopBeenPressed;
+    global checkBox1Visible;
+    global checkBox2Visible;
+    global checkBox3Visible;
+    global checkBox4Visible;
+    global checkBox5Visible;
+    global checkBox6Visible;
     
     if(~startBeenPressed) %I think there needs to be more here
         if(stopBeenPressed)
@@ -106,13 +124,13 @@ function startbutton_Callback(hObject, eventdata, handles)
     
        %Add more plots here to window if necessary
 
-        uPlotSensor1 = animatedline('Color','g', 'MaximumNumPoints', xlimit);
-        uPlotSensor2 = animatedline('Color','r', 'MaximumNumPoints', xlimit);
-        uPlotSensor3 = animatedline('Color','b', 'MaximumNumPoints', xlimit);
-        uPlotSensor4 = animatedline('Color','y', 'MaximumNumPoints', xlimit);
-        uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit);
-        uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit);
-
+        uPlotSensor1 = animatedline('Color','g', 'MaximumNumPoints', xlimit, 'Visible', checkBox1Visible);
+        uPlotSensor2 = animatedline('Color','r', 'MaximumNumPoints', xlimit, 'Visible', checkBox2Visible);
+        uPlotSensor3 = animatedline('Color','b', 'MaximumNumPoints', xlimit, 'Visible', checkBox3Visible);
+        uPlotSensor4 = animatedline('Color','y', 'MaximumNumPoints', xlimit, 'Visible', checkBox4Visible);
+        uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit, 'Visible', checkBox5Visible);
+        uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit, 'Visible', checkBox6Visible);
+        
         %Need to add more to get this to work?
         %Where do I put local read an plot???
         %Setup Udp object
@@ -231,10 +249,6 @@ end
 
 %%----CheckBox Code ------
 
-
-
-
-
 % --- Executes during object creation, after setting all properties.
 function checkbox1_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to checkbox1 (see GCBO)
@@ -294,10 +308,19 @@ function checkbox1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox1
+% Need to Catch the edge case where 
     global uPlotSensor1;
     global startBeenPressed;
-    if(startBeenPressed)
-        if(get(hObject, 'Value') == 0)
+    global checkBox1Visible; %making the value of the checkbox global allows us to access in the initial setup
+    checkbox1 = get(hObject, 'Value');
+    if(checkbox1 == 0)
+        checkBox1Visible = 'off';
+    else
+        checkBox1Visible = 'on';
+    end
+    
+    if(startBeenPressed) %At runtime
+        if(checkbox1 == 0)
           %Set plot 1 to be invisible
           set(uPlotSensor1,'Visible','off');
         else
@@ -316,8 +339,17 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox2
     global uPlotSensor2;
     global startBeenPressed;
+    global checkBox2Visible; 
+    checkBox2 = get(hObject, 'Value');
+    
+    if(checkBox2 == 0)
+        checkBox2Visible = 'off';
+    else
+        checkBox2Visible = 'on';
+    end
+    
     if(startBeenPressed)
-        if(get(hObject, 'Value') == 0)
+        if(checkBox2 == 0)
           %Set plot 1 to be invisible
           set(uPlotSensor2,'Visible','off');
         else
@@ -336,8 +368,17 @@ function checkbox3_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox3
     global startBeenPressed;
     global uPlotSensor3;
+    global checkBox3Visible; 
+    checkBox3 = get(hObject, 'Value');
+    
+    if(checkBox3 == 0)
+        checkBox3Visible = 'off';
+    else
+        checkBox3Visible = 'on';
+    end
+    
     if(startBeenPressed)
-        if(get(hObject, 'Value') == 0)
+        if(checkBox3 == 0)
           %Set plot 1 to be invisible
           set(uPlotSensor3,'Visible','off');
         else
@@ -358,8 +399,17 @@ function checkbox4_Callback(hObject, eventdata, handles)
 %TODO:  Need to see if it is possible to precheck the check boxes
     global uPlotSensor4;
     global startBeenPressed;
+    global checkBox4Visible; 
+    checkBox4 = get(hObject, 'Value');
+    
+    if(checkBox4 == 0)
+        checkBox4Visible = 'off';
+    else
+        checkBox4Visible = 'on';
+    end
+    
     if(startBeenPressed)
-        if(get(hObject, 'Value') == 0)
+        if(checkBox4 == 0)
           %Set plot 1 to be invisible
           set(uPlotSensor4,'Visible','off');
         else
@@ -378,8 +428,16 @@ function checkbox5_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox5
     global uPlotSensor5;
     global startBeenPressed;
+    global checkBox5Visible; 
+    checkBox5 = get(hObject, 'Value');
+    
+    if(checkBox5 == 0)
+        checkBox5Visible = 'off';
+    else
+        checkBox5Visible = 'on';
+    end
     if(startBeenPressed)
-        if(get(hObject, 'Value') == 0)
+        if(checkBox5 == 0)
           %Set plot 1 to be invisible
           set(uPlotSensor5,'Visible','off');
         else
@@ -398,8 +456,17 @@ function checkbox6_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox6
     global uPlotSensor6;
     global startBeenPressed;
+    global checkBox6Visible; 
+    checkBox6 = get(hObject, 'Value');
+    
+    if(checkBox6 == 0)
+        checkBox6Visible = 'off';
+    else
+        checkBox6Visible = 'on';
+    end
+    
     if(startBeenPressed)
-            if(get(hObject, 'Value') == 0)
+            if(checkBox6 == 0)
               %Set plot 1 to be invisible
               set(uPlotSensor6,'Visible','off');
             else
