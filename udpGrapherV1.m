@@ -19,6 +19,18 @@ end
 % End initialization code - DO NOT EDIT
 end
 
+% --- Outputs from this function are returned to the command line.
+function varargout = udpGrapherV1_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+end
+
+
 % --- Executes just before udpGrapherV1 is made visible.
 function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -33,6 +45,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global secondsBetweenFlushes;
     global startBeenPressed;
     global everStarted;
+    global stopBeenPressed;
   
     xlimit = 5000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -41,6 +54,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     secondsBetweenFlushes = 10;
     startBeenPressed = false;
     everStarted = false;
+    stopBeenPressed = false;
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -50,18 +64,6 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % UIWAIT makes udpGrapherV1 wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-end
-
-
-% --- Outputs from this function are returned to the command line.
-function varargout = udpGrapherV1_OutputFcn(hObject, eventdata, handles) 
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Get default command line output from handles structure
-varargout{1} = handles.output;
 end
 
 % --- Executes on button press in startbutton.
@@ -82,8 +84,15 @@ function startbutton_Callback(hObject, eventdata, handles)
     global uPlotSensor6;
     global startBeenPressed;
     global everStarted;
+    global stopBeenPressed;
     
     if(~startBeenPressed) %I think there needs to be more here
+        if(stopBeenPressed)
+            %Clear the axes...
+            %How to clear the axes
+            stopBeenPressed = false;
+            %TODO
+        end
         startBeenPressed = true;
         everStarted = true;
         udpClient = udp('footsensor1.dynamic-dns.net',2390, 'LocalPort', 5000);
@@ -113,6 +122,153 @@ function startbutton_Callback(hObject, eventdata, handles)
         pause(3);
         fprintf(udpClient, 'Connection made.');
     end
+end
+
+function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6, bytesToRead)
+    global xcounter;
+    global xlimit;
+    global numDataSetsInPacket;
+    global countToClearBuffer;
+    global t1;
+    global secondsBetweenFlushes;
+    
+    data = fread(udpClient,bytesToRead);
+    dataStr = char(data(1:end-2)'); %Convert to an array
+   
+    if (length(dataStr) == bytesToRead -2) 
+        if xcounter >= xlimit
+            xcounter = 0;
+            clearpoints(uPlotSensor1);
+            clearpoints(uPlotSensor2);
+            clearpoints(uPlotSensor3);
+            clearpoints(uPlotSensor4);
+            clearpoints(uPlotSensor5);
+            clearpoints(uPlotSensor6);
+        end
+        
+        %Convert to an array of numbers
+        dataNum = sscanf(dataStr, '%d,', bytesToRead);
+        if(length(dataNum) == (numDataSetsInPacket * 6))
+            dataNum2 = reshape(dataNum,[6,numDataSetsInPacket]);
+            sensor1Data = dataNum2(1,:);
+            sensor2Data = dataNum2(2,:);
+            sensor3Data = dataNum2(3,:);
+            sensor4Data = dataNum2(4,:);
+            sensor5Data = dataNum2(5,:);
+            sensor6Data = dataNum2(6,:);
+
+            xData = xcounter+1:(xcounter+numDataSetsInPacket);
+
+            addpoints(uPlotSensor1, xData, sensor1Data);
+            addpoints(uPlotSensor2, xData, sensor2Data);
+            addpoints(uPlotSensor3, xData, sensor3Data);
+            addpoints(uPlotSensor4, xData, sensor4Data);
+            addpoints(uPlotSensor5, xData, sensor5Data);
+            addpoints(uPlotSensor6, xData, sensor6Data);
+            xcounter = xcounter + numDataSetsInPacket;
+            drawnow;
+        end
+    end
+    
+    t2 = clock;
+    if (etime(t2,t1) > secondsBetweenFlushes)
+        flushinput(udpClient);
+        disp('Flushed and Reset Clock');
+        t1 = clock;
+    end 
+    
+    countToClearBuffer = countToClearBuffer + 1;
+end
+
+% --- Executes on button press in stopbutton.
+function stopbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to stopbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global udpClient;
+    global xcounter;
+    global startBeenPressed;
+    global stopBeenPressed;
+    if(startBeenPressed)
+        startBeenPressed = false;
+        stopBeenPressed = true;
+        xcounter = 0;
+        flushinput(udpClient);
+        fclose(udpClient);
+        delete(udpClient);
+        clear udpClient;
+        fclose(instrfindall);
+    end
+end
+
+
+% --- Executes during object deletion, before destroying properties.
+function figure1_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global udpClient;
+    global startBeenPressed;
+    global everStarted;
+    if(startBeenPressed && everStarted) %This means there is still a udp connection
+        flushinput(udpClient);
+        fclose(udpClient);
+        delete(udpClient);
+        clear udpClient;
+        fclose(instrfindall); %Is this necessary?? TODO
+    end
+end
+
+% --- Executes during object creation, after setting all properties.
+function checkbox1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+% --- Executes during object creation, after setting all properties.
+function checkbox2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function checkbox6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to checkbox6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+    set(hObject,'Value',1);
 end
 
 % --- Executes on button press in checkbox1.
@@ -237,153 +393,3 @@ function checkbox6_Callback(hObject, eventdata, handles)
     end
 end
 
-function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6, bytesToRead)
-    global xcounter;
-    global xlimit;
-    global numDataSetsInPacket;
-    global countToClearBuffer;
-    global t1;
-    global secondsBetweenFlushes;
-    
-    data = fread(udpClient,bytesToRead);
-    dataStr = char(data(1:end-2)'); %Convert to an array
-   
-    if (length(dataStr) == bytesToRead -2) 
-        if xcounter >= xlimit
-            xcounter = 0;
-            clearpoints(uPlotSensor1);
-            clearpoints(uPlotSensor2);
-            clearpoints(uPlotSensor3);
-            clearpoints(uPlotSensor4);
-            clearpoints(uPlotSensor5);
-            clearpoints(uPlotSensor6);
-        end
-        
-        %Convert to an array of numbers
-        dataNum = sscanf(dataStr, '%d,', bytesToRead);
-        if(length(dataNum) == (numDataSetsInPacket * 6))
-            dataNum2 = reshape(dataNum,[6,numDataSetsInPacket]);
-            sensor1Data = dataNum2(1,:);
-            sensor2Data = dataNum2(2,:);
-            sensor3Data = dataNum2(3,:);
-            sensor4Data = dataNum2(4,:);
-            sensor5Data = dataNum2(5,:);
-            sensor6Data = dataNum2(6,:);
-
-            xData = xcounter+1:(xcounter+numDataSetsInPacket);
-
-            addpoints(uPlotSensor1, xData, sensor1Data);
-            addpoints(uPlotSensor2, xData, sensor2Data);
-            addpoints(uPlotSensor3, xData, sensor3Data);
-            addpoints(uPlotSensor4, xData, sensor4Data);
-            addpoints(uPlotSensor5, xData, sensor5Data);
-            addpoints(uPlotSensor6, xData, sensor6Data);
-            xcounter = xcounter + numDataSetsInPacket;
-            drawnow;
-        end
-    end
-    
-    t2 = clock;
-    if (etime(t2,t1) > secondsBetweenFlushes)
-        flushinput(udpClient);
-        disp('Flushed and Reset Clock');
-        t1 = clock;
-    end 
-    
-    countToClearBuffer = countToClearBuffer + 1;
-end
-
-
-% --- Executes on button press in stopbutton.
-function stopbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to stopbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    global udpClient;
-    global xcounter;
-    global startBeenPressed;
-    if(startBeenPressed)
-        startBeenPressed = false;
-        xcounter = 0;
-        flushinput(udpClient);
-        fclose(udpClient);
-        delete(udpClient);
-        clear udpClient;
-        fclose(instrfindall);
-        %Clear the plot when the figure closes...
-        %Add Different booleans to prevent errors
-        %TODO: There are a lot of things
-    end
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function checkbox1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-% --- Executes during object creation, after setting all properties.
-function checkbox2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function checkbox3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function checkbox4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function checkbox5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function checkbox6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-    set(hObject,'Value',1);
-end
-
-
-% --- Executes during object deletion, before destroying properties.
-function figure1_DeleteFcn(hObject, eventdata, handles)
-% hObject    handle to figure1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    global udpClient;
-    global xcounter;
-    global startBeenPressed;
-    global everStarted;
-    if(startBeenPressed && everStarted) %This means there is still a udp connection
-        flushinput(udpClient);
-        fclose(udpClient);
-        delete(udpClient);
-        clear udpClient;
-        fclose(instrfindall);
-    end
-end
