@@ -518,22 +518,9 @@ function graph_properties_menu_Callback(hObject, eventdata, handles)
     %We want to bring up an input Dialog
 end
 
-function export_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to export_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-end
-
 
 function properties_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to properties_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-end
-
-% --------------------------------------------------------------------
-function excel_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to excel_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 end
@@ -638,4 +625,27 @@ function LocalPortEdit_CreateFcn(hObject, eventdata, handles)
     end
     global localPort;
     localPort = str2double(get(hObject,'String'));
+end
+
+
+% --------------------------------------------------------------------
+function csv_Callback(hObject, eventdata, handles)
+% hObject    handle to csv (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --------------------------------------------------------------------
+function excel_export_Callback(hObject, eventdata, handles)
+% hObject    handle to excel_export (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --------------------------------------------------------------------
+function export_csv_Callback(hObject, eventdata, handles)
+% hObject    handle to export_csv (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 end
