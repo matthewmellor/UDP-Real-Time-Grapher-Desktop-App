@@ -54,11 +54,11 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global checkBox6Visible;
     
   
-    xlimit = 20000;
+    xlimit = 5000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
     xcounter = 0;
     countToClearBuffer = 0;    
-    secondsBetweenFlushes = 10;
+    secondsBetweenFlushes = 20;
     startBeenPressed = false;
     everStarted = false;
     stopBeenPressed = false;
@@ -170,6 +170,7 @@ function startbutton_Callback(hObject, eventdata, handles)
           fprintf(udpClient, 'Connection made.');
           pause(3);
         end
+        %drawnow;
     end
 end
 
@@ -215,7 +216,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             addpoints(uPlotSensor5, xData, sensor5Data);
             addpoints(uPlotSensor6, xData, sensor6Data);
             xcounter = xcounter + numDataSetsInPacket;
-            drawnow;
+            %drawnow;
         end
     end
     
