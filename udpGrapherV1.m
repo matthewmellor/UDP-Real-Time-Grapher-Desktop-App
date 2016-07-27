@@ -264,6 +264,7 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
         fclose(udpClient);
         delete(udpClient);
         clear udpClient;
+        fclose(instrfindall);
     end
 end
 
