@@ -107,6 +107,10 @@ function startbutton_Callback(hObject, eventdata, handles)
     global remoteHostName;
     global remotePort;
     global localPort;
+    global validIP;
+    global IPEditField;
+    
+    validIP = true;
     
     if(~startBeenPressed) %I think there needs to be more here
         if(stopBeenPressed)
@@ -123,22 +127,21 @@ function startbutton_Callback(hObject, eventdata, handles)
         
         startBeenPressed = true;
         everStarted = true;
+        
+      
         udpClient = udp(remoteHostName, remotePort, 'LocalPort', localPort);
-        flushinput(udpClient);
-    
-    
+        
        %Add more plots here to window if necessary
-
         uPlotSensor1 = animatedline('Color','g', 'MaximumNumPoints', xlimit, 'Visible', checkBox1Visible);
         uPlotSensor2 = animatedline('Color','r', 'MaximumNumPoints', xlimit, 'Visible', checkBox2Visible);
         uPlotSensor3 = animatedline('Color','b', 'MaximumNumPoints', xlimit, 'Visible', checkBox3Visible);
         uPlotSensor4 = animatedline('Color','y', 'MaximumNumPoints', xlimit, 'Visible', checkBox4Visible);
         uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit, 'Visible', checkBox5Visible);
         uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit, 'Visible', checkBox6Visible);
-        
-        %Need to add more to get this to work?
-        %Where do I put local read an plot???
-        %Setup Udp object
+
+            %Need to add more to get this to work?
+            %Where do I put local read an plot???
+            %Setup Udp object
         bytesToRead = (numDataSetsInPacket -1) * 30 + (32); %Reflects length of message recieved may need to be changed
         udpClient.BytesAvailableFcn = {@localReadAndPlot,uPlotSensor1, uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6,bytesToRead};
         udpClient.BytesAvailableFcnMode = 'byte';
@@ -146,9 +149,27 @@ function startbutton_Callback(hObject, eventdata, handles)
         udpClient.InputBufferSize = 1000000;
 
         t1 = clock; %Get the first clock value
-        fopen(udpClient); 
-        fprintf(udpClient, 'Connection made.');
-        pause(3);
+        
+        try
+           fopen(udpClient); 
+        catch
+           fclose(udpClient);
+           delete(udpClient);
+           clear udpClient;
+           validIP = false;
+           disp('In the Catch');
+           startBeenPressed = false;
+           %Seems to be clearing the graph if makes it here
+           disp(stopBeenPressed);
+           set(IPEditField, 'BackgroundColor', [1 0.9 0.9]);
+        end
+        
+        if(validIP)
+          set(IPEditField, 'BackgroundColor', 'white');
+          disp('ValidIP');
+          fprintf(udpClient, 'Connection made.');
+          pause(3);
+        end
     end
 end
 
@@ -225,7 +246,6 @@ function stopbutton_Callback(hObject, eventdata, handles)
         fclose(udpClient);
         delete(udpClient);
         clear udpClient;
-        fclose(instrfindall);
     end
 end
 
@@ -243,7 +263,6 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
         fclose(udpClient);
         delete(udpClient);
         clear udpClient;
-        fclose(instrfindall); %Is this necessary?? TODO
     end
 end
 
@@ -542,10 +561,12 @@ function HostIPEditField_CreateFcn(hObject, eventdata, handles)
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
     global remoteHostName;
+    global IPEditField;
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
     remoteHostName = get(hObject,'String');
+    IPEditField = hObject;
 end
 
 
