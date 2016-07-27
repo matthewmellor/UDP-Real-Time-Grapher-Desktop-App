@@ -54,7 +54,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global checkBox6Visible;
     
   
-    xlimit = 5000;
+    xlimit = 20000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
     xcounter = 0;
     countToClearBuffer = 0;    
