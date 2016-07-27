@@ -258,7 +258,7 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
     global udpClient;
     global startBeenPressed;
     global everStarted;
-    if(startBeenPressed && everStarted) %This means there is still a udp connection
+    if(startBeenPressed && everStarted) 
         flushinput(udpClient);
         fclose(udpClient);
         delete(udpClient);
@@ -646,6 +646,53 @@ end
 % --------------------------------------------------------------------
 function export_csv_Callback(hObject, eventdata, handles)
 % hObject    handle to export_csv (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+
+function edit_equation_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_equation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_equation as text
+%        str2double(get(hObject,'String')) returns contents of edit_equation as a double
+end
+
+% --- Executes during object creation, after setting all properties.
+function edit_equation_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_equation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+
+% --- Executes on button press in applyEquation.
+function applyEquation_Callback(hObject, eventdata, handles)
+% hObject    handle to applyEquation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in reset_equation.
+function reset_equation_Callback(hObject, eventdata, handles)
+% hObject    handle to reset_equation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in help_button.
+function help_button_Callback(hObject, eventdata, handles)
+% hObject    handle to help_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 end
