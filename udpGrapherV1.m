@@ -193,7 +193,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             clearpoints(uPlotSensor5);
             clearpoints(uPlotSensor6);
         end
-        disp(userVerifiedFunction(1));
+        
         %Convert to an array of numbers
         dataNum = sscanf(dataStr, '%d,', bytesToRead);
         if(length(dataNum) == (numDataSetsInPacket * 6))
