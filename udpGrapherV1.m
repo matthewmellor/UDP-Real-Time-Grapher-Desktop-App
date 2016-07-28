@@ -20,7 +20,7 @@ end
 end
 
 % --- Outputs from this function are returned to the command line.
-function varargout = udpGrapherV1_OutputFcn(hObject, eventdata, handles) 
+function varargout = udpGrapherV1_OutputFcn(hObject, eventdata, handles)  %#ok<*INUSL>
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -272,7 +272,7 @@ end
 %%-----------------------CheckBox Code ------------------------------
 
 % --- Executes during object creation, after setting all properties.
-function checkbox1_CreateFcn(hObject, eventdata, handles)
+function checkbox1_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 % hObject    handle to checkbox1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -280,7 +280,7 @@ function checkbox1_CreateFcn(hObject, eventdata, handles)
 end
 
 % --- Executes during object creation, after setting all properties.
-function checkbox2_CreateFcn(hObject, eventdata, handles)
+function checkbox2_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU>
 % hObject    handle to checkbox2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
