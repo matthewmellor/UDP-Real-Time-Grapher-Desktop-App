@@ -52,6 +52,12 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global checkBox4Visible;
     global checkBox5Visible;
     global checkBox6Visible;
+    global exportSensor1Array;
+    global exportSensor2Array;
+    global exportSensor3Array;
+    global exportSensor4Array;
+    global exportSensor5Array;
+    global exportSensor6Array;
     
   
     xlimit = 5000;
@@ -68,6 +74,12 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     checkBox4Visible = 'on';
     checkBox5Visible = 'on';
     checkBox6Visible = 'on';
+    exportSensor1Array = [];
+    exportSensor2Array = [];
+    exportSensor3Array = [];
+    exportSensor4Array = [];
+    exportSensor5Array = [];
+    exportSensor6Array = [];
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -179,6 +191,12 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global t1;
     global secondsBetweenFlushes;
     global userVerifiedFunction; 
+    global exportSensor1Array;
+    global exportSensor2Array;
+    global exportSensor3Array;
+    global exportSensor4Array;
+    global exportSensor5Array;
+    global exportSensor6Array;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
@@ -204,7 +222,15 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             sensor4Data = userVerifiedFunction(dataNum2(4,:));
             sensor5Data = userVerifiedFunction(dataNum2(5,:));
             sensor6Data = userVerifiedFunction(dataNum2(6,:));
-
+            
+            exportSensor1Array = [exportSensor1Array, sensor1Data]; %This will most likely need to be changed
+            exportSensor2Array = [exportSensor2Array, sensor2Data];
+            exportSensor3Array = [exportSensor3Array, sensor3Data];
+            exportSensor4Array = [exportSensor4Array, sensor4Data];
+            exportSensor5Array = [exportSensor5Array, sensor5Data];
+            exportSensor6Array = [exportSensor6Array, sensor6Data];
+            
+           
             xData = xcounter+1:(xcounter+numDataSetsInPacket);
 
             addpoints(uPlotSensor1, xData, sensor1Data);
@@ -251,7 +277,7 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
     global udpClient;
     global startBeenPressed;
     global everStarted;
-    if(startBeenPressed && everStarted) 
+    if(startBeenPressed && everStarted) %TODO Add try catch 
         flushinput(udpClient);
         fclose(udpClient);
         delete(udpClient);
@@ -511,27 +537,30 @@ function HostIPEditField_Callback(hObject, eventdata, handles)
     remoteHostName = get(hObject,'String');
 end
 
-% --- Executes on button press in pushbutton5.
 function setButton_Callback(hObject, eventdata, handles)
     %Check to see what the remote port and local port and other are valid
     %TODO change this to a structure similar to used for equation...TODO...
 end
 
-% --------------------------------------------------------------------
+%--------------------TOOLBAR Code--------------------------
 function csv_Callback(hObject, eventdata, handles)
 end
 
-
-% --------------------------------------------------------------------
 function excel_export_Callback(hObject, eventdata, handles)
+    global exportSensor1Array;
+    global exportSensor2Array;
+    global exportSensor3Array;
+    global exportSensor4Array;
+    global exportSensor5Array;
+    global exportSensor6Array;
+    disp(exportSensor1Array);
+    %TODO...Not sure why this is working so well...
 end
 
-% --------------------------------------------------------------------
 function export_csv_Callback(hObject, eventdata, handles)
 end
 
-
-% --- Executes during object creation, after setting all properties.
+%---------------USER EQUATION INPUT CODE ------------------
 function edit_equation_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
@@ -561,7 +590,6 @@ function edit_equation_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in applyEquation.
 function applyEquation_Callback(hObject, eventdata, handles)
     global userUnVerifiedFunction;
     global userVerifiedFunction;
