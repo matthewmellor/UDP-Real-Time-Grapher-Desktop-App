@@ -81,9 +81,6 @@ end
 
 % --- Executes on button press in startbutton.
 function startbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to startbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 %This is the start button so we want to do alot here....
     global t1;
     global xlimit;
@@ -181,6 +178,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global countToClearBuffer;
     global t1;
     global secondsBetweenFlushes;
+    global userVerifiedFunction; 
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
@@ -195,17 +193,17 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             clearpoints(uPlotSensor5);
             clearpoints(uPlotSensor6);
         end
-        
+        disp(userVerifiedFunction(1));
         %Convert to an array of numbers
         dataNum = sscanf(dataStr, '%d,', bytesToRead);
         if(length(dataNum) == (numDataSetsInPacket * 6))
             dataNum2 = reshape(dataNum,[6,numDataSetsInPacket]);
-            sensor1Data = dataNum2(1,:);
-            sensor2Data = dataNum2(2,:);
-            sensor3Data = dataNum2(3,:);
-            sensor4Data = dataNum2(4,:);
-            sensor5Data = dataNum2(5,:);
-            sensor6Data = dataNum2(6,:);
+            sensor1Data = userVerifiedFunction(dataNum2(1,:));
+            sensor2Data = userVerifiedFunction(dataNum2(2,:));
+            sensor3Data = userVerifiedFunction(dataNum2(3,:));
+            sensor4Data = userVerifiedFunction(dataNum2(4,:));
+            sensor5Data = userVerifiedFunction(dataNum2(5,:));
+            sensor6Data = userVerifiedFunction(dataNum2(6,:));
 
             xData = xcounter+1:(xcounter+numDataSetsInPacket);
 
@@ -232,9 +230,6 @@ end
 
 % --- Executes on button press in stopbutton.
 function stopbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to stopbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
     global udpClient;
     global xcounter;
     global startBeenPressed;
@@ -253,9 +248,6 @@ end
 
 % --- Executes during object deletion, before destroying properties.
 function figure1_DeleteFcn(hObject, eventdata, handles)
-% hObject    handle to figure1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
     global udpClient;
     global startBeenPressed;
     global everStarted;
@@ -273,64 +265,40 @@ end
 
 % --- Executes during object creation, after setting all properties.
 function checkbox1_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
-% hObject    handle to checkbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 % --- Executes during object creation, after setting all properties.
 function checkbox2_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU>
-% hObject    handle to checkbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 
 % --- Executes during object creation, after setting all properties.
 function checkbox3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 
 % --- Executes during object creation, after setting all properties.
 function checkbox4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 
 % --- Executes during object creation, after setting all properties.
 function checkbox5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 
 % --- Executes during object creation, after setting all properties.
 function checkbox6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to checkbox6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
     set(hObject,'Value',1);
 end
 
 % --- Executes on button press in checkbox1.
 function checkbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox1
-% Need to Catch the edge case where 
     global uPlotSensor1;
     global startBeenPressed;
     global checkBox1Visible; %making the value of the checkbox global allows us to access in the initial setup
@@ -354,11 +322,6 @@ end
 
 % --- Executes on button press in checkbox2.
 function checkbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox2
     global uPlotSensor2;
     global startBeenPressed;
     global checkBox2Visible; 
@@ -383,11 +346,6 @@ end
 
 % --- Executes on button press in checkbox3.
 function checkbox3_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox3
     global startBeenPressed;
     global uPlotSensor3;
     global checkBox3Visible; 
@@ -412,13 +370,6 @@ end
 
 % --- Executes on button press in checkbox4.
 function checkbox4_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox4
-%Check box = 1 if checked == 0 if not checked
-%TODO:  Need to see if it is possible to precheck the check boxes
     global uPlotSensor4;
     global startBeenPressed;
     global checkBox4Visible; 
@@ -443,11 +394,6 @@ end
 
 % --- Executes on button press in checkbox5.
 function checkbox5_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox5
     global uPlotSensor5;
     global startBeenPressed;
     global checkBox5Visible; 
@@ -471,11 +417,6 @@ end
 
 % --- Executes on button press in checkbox6.
 function checkbox6_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox6
     global uPlotSensor6;
     global startBeenPressed;
     global checkBox6Visible; 
@@ -499,56 +440,25 @@ function checkbox6_Callback(hObject, eventdata, handles)
 end
 
 function file_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to file_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
 
 function udp_properties_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to udp_properties_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    %We want to bring up a input Dialog box here****
 end
 
 
 function graph_properties_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to graph_properties_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    %We want to bring up an input Dialog
 end
 
 
 function properties_menu_Callback(hObject, eventdata, handles)
-% hObject    handle to properties_menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
 
 %----------------UDP Parameters--------------------------------------------
-function HostIPEditField_Callback(hObject, eventdata, handles)
-% hObject    handle to HostIPEditField (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of HostIPEditField as text
-%        str2double(get(hObject,'String')) returns contents of HostIPEditField as a double
-    global remoteHostName;
-    remoteHostName = get(hObject,'String');
-end
-
 
 % --- Executes during object creation, after setting all properties.
 function HostIPEditField_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to HostIPEditField (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
     global remoteHostName;
     global IPEditField;
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -558,36 +468,8 @@ function HostIPEditField_CreateFcn(hObject, eventdata, handles)
     IPEditField = hObject;
 end
 
-
-
-% --- Executes on button press in pushbutton5.
-function setButton_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-    %Check to see what the remote port and local port and other are valid
-    
-end
-
-
-
-function RemotePortEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to RemotePortEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of RemotePortEdit as text
-%        str2double(get(hObject,'String')) returns contents of RemotePortEdit as a double
-    global remotePort;
-    remotePort = str2double(get(hObject,'String'));
-end
-
-
 % --- Executes during object creation, after setting all properties.
 function RemotePortEdit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to RemotePortEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
@@ -599,27 +481,8 @@ function RemotePortEdit_CreateFcn(hObject, eventdata, handles)
 end
 
 
-function LocalPortEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to LocalPortEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of LocalPortEdit as text
-%        str2double(get(hObject,'String')) returns contents of LocalPortEdit as a double
- %Set the value of the local port to whatever it is now
- %Global variable
- %Need to check if the 
-    global localPort;
-    localPort = str2double(get(hObject,'String'));
-end
-
-
 % --- Executes during object creation, after setting all properties.
 function LocalPortEdit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to LocalPortEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
     % Hint: edit controls usually have a white background on Windows.
     %       See ISPC and COMPUTER.
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -630,71 +493,120 @@ function LocalPortEdit_CreateFcn(hObject, eventdata, handles)
 end
 
 
+function RemotePortEdit_Callback(hObject, eventdata, handles)
+    global remotePort;
+    remotePort = str2double(get(hObject,'String'));
+end
+
+function LocalPortEdit_Callback(hObject, eventdata, handles)
+ %Set the value of the local port to whatever it is now
+ %Global variable
+ %Need to check if the 
+    global localPort;
+    localPort = str2double(get(hObject,'String'));
+end
+
+function HostIPEditField_Callback(hObject, eventdata, handles)
+    global remoteHostName;
+    remoteHostName = get(hObject,'String');
+end
+
+% --- Executes on button press in pushbutton5.
+function setButton_Callback(hObject, eventdata, handles)
+    %Check to see what the remote port and local port and other are valid
+    %TODO change this to a structure similar to used for equation...TODO...
+end
+
 % --------------------------------------------------------------------
 function csv_Callback(hObject, eventdata, handles)
-% hObject    handle to csv (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
 
 % --------------------------------------------------------------------
 function excel_export_Callback(hObject, eventdata, handles)
-% hObject    handle to excel_export (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
 % --------------------------------------------------------------------
 function export_csv_Callback(hObject, eventdata, handles)
-% hObject    handle to export_csv (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 end
 
-
-
-function edit_equation_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_equation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit_equation as text
-%        str2double(get(hObject,'String')) returns contents of edit_equation as a double
-end
 
 % --- Executes during object creation, after setting all properties.
 function edit_equation_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_equation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+    %Set the initial equation to be applied to the graph
+    global userVerifiedFunction;
+    global userDefinedAFunction;
+    userDefinedAFunction = false;
+    userVerifiedFunction = str2func('@(x) x');
+    disp('User Function');
+    disp(userVerifiedFunction(1));
+    %This will always be x...which will be the always be acceptable
+    %input/the default
+end
+
+
+function edit_equation_Callback(hObject, eventdata, handles)
+    global userUnVerifiedFunction;
+    global userDefinedAFunction;
+    global userFunctionFieldHandle;
+    global userEQString;
+    userDefinedAFunction = true;
+    userFunctionFieldHandle = hObject;
+    userEQString = get(hObject, 'String');
+    userUnVerifiedFunction = str2func(['@(x)' vectorize(userEQString)]);
+    disp('Equation Was Added');
 end
 
 
 % --- Executes on button press in applyEquation.
 function applyEquation_Callback(hObject, eventdata, handles)
-% hObject    handle to applyEquation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    global userUnVerifiedFunction;
+    global userVerifiedFunction;
+    global userDefinedAFunction;
+    global userFunctionFieldHandle; %Should I vectorize the equation???
+    global userEQString;
+    x = [1,2,3];
+    equationWasValid = true;
+    disp('Apply was pressed');
+    if(userDefinedAFunction) %In the event user pressed apply without having inputted an equation.
+        try
+           y = userUnVerifiedFunction(x);
+           disp('Tried the user function');
+        catch
+           disp('bad function');
+           set(userFunctionFieldHandle, 'BackgroundColor', [1 0.9 0.9]);
+           equationWasValid = false;
+        end
+        if(equationWasValid)
+            if(length(y) == 3)
+                userVerifiedFunction = userUnVerifiedFunction;
+                set(userFunctionFieldHandle, 'BackgroundColor', 'white');
+                disp('Equation was valid');
+            else
+                 %set(userFunctionFieldHandle, 'BackgroundColor', [1 0.9 0.9]);
+                 %disp('Equation Not valid Because it was a constant');
+                 userVerifiedFunction = str2func(strcat('@(x)',userEQString,'*ones(1,length(x))'));
+            end
+        end
+    end
 end
 
 
 % --- Executes on button press in reset_equation.
 function reset_equation_Callback(hObject, eventdata, handles)
-% hObject    handle to reset_equation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    global userVerifiedFunction;
+    global userFunctionFieldHandle;
+    global userUnVerifiedFunction;
+    userVerifiedFunction = str2func('@(x) x');
+    userUnVerifiedFunction = userVerifiedFunction;
+    set(userFunctionFieldHandle, 'String', 'x');
+    set(userFunctionFieldHandle, 'BackgroundColor', 'white');
 end
 
 % --- Executes on button press in help_button.
 function help_button_Callback(hObject, eventdata, handles)
-% hObject    handle to help_button (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+    %TODO bring up popup about syntax
 end
