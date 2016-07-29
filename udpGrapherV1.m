@@ -198,10 +198,13 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global startBeenPressed;
     global stopBeenPressed;
     
+    
+    
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
-    %disp(dataStr);
-   
+    disp(dataStr);
+    autoStopPressed = false; %TODO fix this
+    
     if (length(dataStr) == bytesToRead -2) 
         if xcounter >= xlimit
             if(autoStop)
@@ -213,6 +216,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                     fclose(udpClient);
                     delete(udpClient);
                     clear udpClient;
+                    autoStopPressed = true;
                 end
             else
                 xcounter = 0;
@@ -256,7 +260,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
         end
     end
     
-    if(~autoStop)
+    if(~autoStopPressed)
         t2 = clock;
         if (etime(t2,t1) > secondsBetweenFlushes)
             flushinput(udpClient);
@@ -732,4 +736,14 @@ end
 function autoStop_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of autoStop
 %TODO: update this and the create function
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function autoStop_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to autoStop (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global autoStop;
+autoStop = true;
 end
