@@ -148,9 +148,6 @@ function startbutton_Callback(hObject, eventdata, handles)
         uPlotSensor5 = animatedline('Color','m', 'MaximumNumPoints', xlimit, 'Visible', checkBox5Visible);
         uPlotSensor6 = animatedline('Color','w', 'MaximumNumPoints', xlimit, 'Visible', checkBox6Visible);
 
-            %Need to add more to get this to work?
-            %Where do I put local read an plot???
-            %Setup Udp object
         bytesToRead = (numDataSetsInPacket -1) * 30 + (32); %Reflects length of message recieved may need to be changed
         udpClient.BytesAvailableFcn = {@localReadAndPlot,uPlotSensor1, uPlotSensor2,uPlotSensor3,uPlotSensor4,uPlotSensor5,uPlotSensor6,bytesToRead};
         udpClient.BytesAvailableFcnMode = 'byte';
@@ -197,19 +194,35 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global exportSensor4Array;
     global exportSensor5Array;
     global exportSensor6Array;
+    global autoStop;
+    global startBeenPressed;
+    global stopBeenPressed;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
+    %disp(dataStr);
    
     if (length(dataStr) == bytesToRead -2) 
         if xcounter >= xlimit
-            xcounter = 0;
-            clearpoints(uPlotSensor1);
-            clearpoints(uPlotSensor2);
-            clearpoints(uPlotSensor3);
-            clearpoints(uPlotSensor4);
-            clearpoints(uPlotSensor5);
-            clearpoints(uPlotSensor6);
+            if(autoStop)
+               if(startBeenPressed)
+                    startBeenPressed = false;
+                    stopBeenPressed = true;
+                    xcounter = 0;
+                    flushinput(udpClient);
+                    fclose(udpClient);
+                    delete(udpClient);
+                    clear udpClient;
+                end
+            else
+                xcounter = 0;
+                clearpoints(uPlotSensor1);
+                clearpoints(uPlotSensor2);
+                clearpoints(uPlotSensor3);
+                clearpoints(uPlotSensor4);
+                clearpoints(uPlotSensor5);
+                clearpoints(uPlotSensor6);
+            end
         end
         
         %Convert to an array of numbers
@@ -222,14 +235,6 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             sensor4Data = userVerifiedFunction(dataNum2(4,:));
             sensor5Data = userVerifiedFunction(dataNum2(5,:));
             sensor6Data = userVerifiedFunction(dataNum2(6,:));
-            
-            exportSensor1Array = [exportSensor1Array, sensor1Data]; %This will most likely need to be changed
-            exportSensor2Array = [exportSensor2Array, sensor2Data];
-            exportSensor3Array = [exportSensor3Array, sensor3Data];
-            exportSensor4Array = [exportSensor4Array, sensor4Data];
-            exportSensor5Array = [exportSensor5Array, sensor5Data];
-            exportSensor6Array = [exportSensor6Array, sensor6Data];
-            
            
             xData = xcounter+1:(xcounter+numDataSetsInPacket);
 
@@ -241,16 +246,24 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             addpoints(uPlotSensor6, xData, sensor6Data);
             xcounter = xcounter + numDataSetsInPacket;
             drawnow;
+            
+                exportSensor1Array = ([exportSensor1Array, sensor1Data]); %This will most likely need to be changed
+                exportSensor2Array = ([exportSensor2Array, sensor2Data]);
+                exportSensor3Array = ([exportSensor3Array, sensor3Data]);
+                exportSensor4Array = ([exportSensor4Array, sensor4Data]);
+                exportSensor5Array = ([exportSensor5Array, sensor5Data]);
+                exportSensor6Array = ([exportSensor6Array, sensor6Data]);
         end
     end
     
-    t2 = clock;
-    if (etime(t2,t1) > secondsBetweenFlushes)
-        flushinput(udpClient);
-        disp('Flushed and Reset Clock');
-        t1 = clock;
-    end 
-    
+    if(~autoStop)
+        t2 = clock;
+        if (etime(t2,t1) > secondsBetweenFlushes)
+            flushinput(udpClient);
+            disp('Flushed and Reset Clock');
+            t1 = clock;
+        end 
+    end
     countToClearBuffer = countToClearBuffer + 1;
 end
 
@@ -556,7 +569,7 @@ function excel_export_Callback(hObject, eventdata, handles)
     
     %Need to ensure that the graph is stopped when this is pressed
     %TODO
-  
+    
     s1 = transpose(exportSensor1Array);
     s2 = transpose(exportSensor2Array);
     s3 = transpose(exportSensor3Array);
@@ -564,6 +577,7 @@ function excel_export_Callback(hObject, eventdata, handles)
     s5 = transpose(exportSensor5Array);
     s6 = transpose(exportSensor6Array);
     
+    display('Exporting To Excel');
     filename = 'graphTest1.xlsx'; %Need to implement a way for users to input a TitleName
     xlswrite(filename,s1,1,'A1');
     xlswrite(filename,s2,1,'B1');
@@ -593,8 +607,6 @@ function edit_equation_CreateFcn(hObject, eventdata, handles)
     global userDefinedAFunction;
     userDefinedAFunction = false;
     userVerifiedFunction = str2func('@(x) x');
-    disp('User Function');
-    disp(userVerifiedFunction(1));
     %This will always be x...which will be the always be acceptable
     %input/the default
 end
@@ -645,7 +657,6 @@ function applyEquation_Callback(hObject, eventdata, handles)
     end
 end
 
-
 % --- Executes on button press in reset_equation.
 function reset_equation_Callback(hObject, eventdata, handles)
     global userVerifiedFunction;
@@ -660,4 +671,65 @@ end
 % --- Executes on button press in help_button.
 function help_button_Callback(hObject, eventdata, handles)
     %TODO bring up popup about syntax
+end
+
+
+% --- Executes on button press in pushbutton10.
+function pushbutton10_Callback(hObject, eventdata, handles)
+end
+
+
+function edit11_Callback(hObject, eventdata, handles)
+% Hints: get(hObject,'String') returns contents of edit11 as text
+%        str2double(get(hObject,'String')) returns contents of edit11 as a double
+end
+
+% --- Executes during object creation, after setting all properties.
+function edit11_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function edit12_Callback(hObject, eventdata, handles)
+% hObject    handle to edit12 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit12 as text
+%        str2double(get(hObject,'String')) returns contents of edit12 as a double
+end
+
+% --- Executes during object creation, after setting all properties.
+function edit12_CreateFcn(hObject, eventdata, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function edit13_Callback(hObject, eventdata, handles)
+
+% Hints: get(hObject,'String') returns contents of edit13 as text
+%        str2double(get(hObject,'String')) returns contents of edit13 as a double
+end
+
+% --- Executes during object creation, after setting all properties.
+function edit13_CreateFcn(hObject, eventdata, handles)
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+% --------------------------------------------------------------------
+function help_Callback(hObject, eventdata, handles)
+end
+
+
+% --- Executes on button press in autoStop.
+function autoStop_Callback(hObject, eventdata, handles)
+% Hint: get(hObject,'Value') returns toggle state of autoStop
+%TODO: update this and the create function
 end
