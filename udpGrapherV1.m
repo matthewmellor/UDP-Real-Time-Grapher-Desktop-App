@@ -60,7 +60,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global exportSensor6Array;
     
   
-    xlimit = 5000;
+    xlimit = 100000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
     xcounter = 0;
     countToClearBuffer = 0;    
