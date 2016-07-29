@@ -553,8 +553,28 @@ function excel_export_Callback(hObject, eventdata, handles)
     global exportSensor4Array;
     global exportSensor5Array;
     global exportSensor6Array;
-    disp(exportSensor1Array);
-    %TODO...Not sure why this is working so well...
+  
+    s1 = transpose(exportSensor1Array);
+    s2 = transpose(exportSensor2Array);
+    s3 = transpose(exportSensor3Array);
+    s4 = transpose(exportSensor4Array);
+    s5 = transpose(exportSensor5Array);
+    s6 = transpose(exportSensor6Array);
+    
+    filename = 'graphTest1.xlsx';
+    xlswrite(filename,s1,1,'A1');
+    xlswrite(filename,s2,1,'B1');
+    xlswrite(filename,s3,1,'C1');
+    xlswrite(filename,s4,1,'D1');
+    xlswrite(filename,s5,1,'E1');
+    xlswrite(filename,s6,1,'F1');
+    
+    clear exportSensor1Array;
+    clear exportSensor2Array;
+    clear exportSensor3Array;
+    clear exportSensor4Array;
+    clear exportSensor5Array;
+    clear exportSensor6Array;
 end
 
 function export_csv_Callback(hObject, eventdata, handles)
