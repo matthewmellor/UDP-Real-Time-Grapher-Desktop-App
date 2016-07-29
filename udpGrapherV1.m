@@ -553,6 +553,9 @@ function excel_export_Callback(hObject, eventdata, handles)
     global exportSensor4Array;
     global exportSensor5Array;
     global exportSensor6Array;
+    
+    %Need to ensure that the graph is stopped when this is pressed
+    %TODO
   
     s1 = transpose(exportSensor1Array);
     s2 = transpose(exportSensor2Array);
@@ -561,7 +564,7 @@ function excel_export_Callback(hObject, eventdata, handles)
     s5 = transpose(exportSensor5Array);
     s6 = transpose(exportSensor6Array);
     
-    filename = 'graphTest1.xlsx';
+    filename = 'graphTest1.xlsx'; %Need to implement a way for users to input a TitleName
     xlswrite(filename,s1,1,'A1');
     xlswrite(filename,s2,1,'B1');
     xlswrite(filename,s3,1,'C1');
@@ -569,8 +572,8 @@ function excel_export_Callback(hObject, eventdata, handles)
     xlswrite(filename,s5,1,'E1');
     xlswrite(filename,s6,1,'F1');
     
-    clear exportSensor1Array;
-    clear exportSensor2Array;
+    clear exportSensor1Array; %When to do this needs to be figured out...
+    clear exportSensor2Array; %Maybe there should be a reset button?????
     clear exportSensor3Array;
     clear exportSensor4Array;
     clear exportSensor5Array;
