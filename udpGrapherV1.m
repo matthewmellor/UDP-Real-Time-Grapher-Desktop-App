@@ -65,6 +65,9 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global exportContainer5;
     global exportContainer6;
     global numExportDataDumps;
+    global dataCurrentlyExporting;
+    global dataBeenExported;
+    global graphingHasOccured;
   
     xlimit = 50000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -93,6 +96,9 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     exportContainer5 = {};
     exportContainer6 = {};
     numExportDataDumps = 1;
+    dataCurrentlyExporting = false;
+    dataBeenExported = false;
+    graphingHasOccured = false;
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -131,10 +137,19 @@ function startbutton_Callback(hObject, eventdata, handles)
     global localPort;
     global validIP;
     global IPEditField;
+    global dataCurrentlyExporting;
+    global dataBeenExported;
+    global exportContainer1;
+    global exportContainer2;
+    global exportContainer3;
+    global exportContainer4;
+    global exportContainer5;
+    global exportContainer6;
+    global numExportDataDumps;
     
     validIP = true;
     
-    if(~startBeenPressed) %I think there needs to be more here
+    if(~startBeenPressed && ~dataCurrentlyExporting) %Nothing will happen if data is currently exporting
         if(stopBeenPressed)
             %Clear the axes...
             %How to clear the axes
@@ -150,7 +165,17 @@ function startbutton_Callback(hObject, eventdata, handles)
         startBeenPressed = true;
         everStarted = true;
         
-      
+        if(dataBeenExported)
+           %Clear the exportData 
+            exportContainer1 = {};
+            exportContainer2 = {};
+            exportContainer3 = {};
+            exportContainer4 = {};
+            exportContainer5 = {};
+            exportContainer6 = {};
+            numExportDataDumps = 1;
+        end
+        
         udpClient = udp(remoteHostName, remotePort, 'LocalPort', localPort);
         
        %Add more plots here to window if necessary
@@ -524,7 +549,6 @@ end
 function file_menu_Callback(hObject, eventdata, handles)
 end
 
-
 function udp_properties_menu_Callback(hObject, eventdata, handles)
 end
 
@@ -609,33 +633,90 @@ function excel_export_Callback(hObject, eventdata, handles)
     global exportContainer4;
     global exportContainer5;
     global exportContainer6;
+    global dataBeenExported;
+    global dataCurrentlyExporting;
+    global exportSensor1Array;
+    global exportSensor2Array;
+    global exportSensor3Array;
+    global exportSensor4Array;
+    global exportSensor5Array;
+    global exportSensor6Array;
+    global udpClient;
+    global xcounter;
+    global startBeenPressed;
+    global stopBeenPressed;
     
-    %Need to ensure that the graph is stopped when this is pressed
-    %TODO
+    if(startBeenPressed) %Stop graphing if still graphing
+        startBeenPressed = false;
+        stopBeenPressed = true;
+        xcounter = 0;
+        flushinput(udpClient);
+        fclose(udpClient);
+        delete(udpClient);
+        clear udpClient;
+    end
+    
+    %What needs to go here?
+    disp('In export Function');
+    %Should probably make sure that the data in the containers is
+    %uptodate...
+    %Should make sure that 
+        disp('past start been pressed');
+        dataBeenExported = false;
+        dataCurrentlyExporting = true;
+        %How to clear the data if export has been pressed
+        %What happens if you press start while the data is exporting?????
 
-    s1 = transpose([exportContainer1{:}]);
-    s2 = transpose([exportContainer2{:}]);
-    s3 = transpose([exportContainer3{:}]);
-    s4 = transpose([exportContainer4{:}]);
-    s5 = transpose([exportContainer5{:}]);
-    s6 = transpose([exportContainer6{:}]);
+        %Add Any data that hasn't been addedTo exportContainers
+        index = length(exportContainer1) +1; %It shouldn't matter if export pressed repeatedly
+        exportContainer1{1,index} = exportSensor1Array; %There will be no repeated data...
+        exportContainer2{1,index} = exportSensor2Array; %BC exportSensorXArray = []
+        exportContainer3{1,index} = exportSensor3Array; %After the first time the data is added
+        exportContainer4{1,index} = exportSensor4Array;
+        exportContainer5{1,index} = exportSensor5Array;
+        exportContainer6{1,index} = exportSensor6Array;
+        
+        
+        s1 = transpose([exportContainer1{:}]);
+        s2 = transpose([exportContainer2{:}]);
+        s3 = transpose([exportContainer3{:}]);
+        s4 = transpose([exportContainer4{:}]);
+        s5 = transpose([exportContainer5{:}]);
+        s6 = transpose([exportContainer6{:}]);
+
+        prompt = {'  Enter the desired filename (Do not include .xlsx)  '};
+        dlg_title = 'Excel Export';
+        num_lines = 1;
+        defaultans = {'foot_sensor_data_1'};
+        answer = inputdlg(prompt, dlg_title,num_lines, defaultans);
+        filename = answer{1,1};
+        
+        if(~isempty(answer) && ~isempty(s1))
+            disp('Exporting To Excel');
+            disp(filename);
+           
+            try
+                xlswrite(filename,s1,1,'A1'); %If you press it too soon it causes an error
+                xlswrite(filename,s2,1,'B1');
+                xlswrite(filename,s3,1,'C1');
+                xlswrite(filename,s4,1,'D1');
+                xlswrite(filename,s5,1,'E1');
+                xlswrite(filename,s6,1,'F1');
+                disp('Done Exporting');
+            catch
+                disp('Couldnt export the data');
+            end
+            dataBeenExported = true; %Wait until done exporting for Operations to begin again (I need a blocking command)
+            dataCurrentlyExporting = false;
+        end 
+        
+         exportSensor1Array = []; 
+         exportSensor2Array = []; 
+         exportSensor3Array = [];
+         exportSensor4Array = [];
+         exportSensor5Array = [];
+         exportSensor6Array = [];
     
-    disp('Exporting To Excel');
-    filename = 'graphTest3.xlsx'; %Need to implement a way for users to input a TitleName
-    xlswrite(filename,s1,1,'A1');
-    xlswrite(filename,s2,1,'B1');
-    xlswrite(filename,s3,1,'C1');
-    xlswrite(filename,s4,1,'D1');
-    xlswrite(filename,s5,1,'E1');
-    xlswrite(filename,s6,1,'F1');
-    disp('Done Exporting');
-    
-    clear exportSensor1Array; %When to do this needs to be figured out...
-    clear exportSensor2Array; %Maybe there should be a reset button?????
-    clear exportSensor3Array;
-    clear exportSensor4Array;
-    clear exportSensor5Array;
-    clear exportSensor6Array;
 end
 
 function export_csv_Callback(hObject, eventdata, handles)
