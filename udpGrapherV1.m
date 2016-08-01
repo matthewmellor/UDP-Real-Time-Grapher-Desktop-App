@@ -58,7 +58,13 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global exportSensor4Array;
     global exportSensor5Array;
     global exportSensor6Array;
-    
+    global exportContainer1;
+    global exportContainer2;
+    global exportContainer3;
+    global exportContainer4;
+    global exportContainer5;
+    global exportContainer6;
+    global numExportDataDumps;
   
     xlimit = 50000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -80,6 +86,13 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     exportSensor4Array = [];
     exportSensor5Array = [];
     exportSensor6Array = [];
+    exportContainer1 = {};
+    exportContainer2 = {};
+    exportContainer3 = {};
+    exportContainer4 = {};
+    exportContainer5 = {};
+    exportContainer6 = {};
+    numExportDataDumps = 1;
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -197,17 +210,22 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global autoStop;
     global startBeenPressed;
     global stopBeenPressed;
-    
-    
+    global exportContainer1;
+    global exportContainer2;
+    global exportContainer3;
+    global exportContainer4;
+    global exportContainer5;
+    global exportContainer6;
+    global numExportDataDumps;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
-    disp(dataStr);
-    autoStopPressed = false; %TODO fix this
+    %disp(dataStr);
+    autoStopPressed = false; %This is perfect...
     
     if (length(dataStr) == bytesToRead -2) 
-        if xcounter >= xlimit
-            if(autoStop)
+        if xcounter >= xlimit 
+            if(autoStop) %Where has this been set to true by default?
                if(startBeenPressed)
                     startBeenPressed = false;
                     stopBeenPressed = true;
@@ -216,7 +234,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                     fclose(udpClient);
                     delete(udpClient);
                     clear udpClient;
-                    autoStopPressed = true;
+                    autoStopPressed = true; %Where does this get set back to false?
                 end
             else
                 xcounter = 0;
@@ -229,41 +247,62 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
             end
         end
         
-        %Convert to an array of numbers
-        dataNum = sscanf(dataStr, '%d,', bytesToRead);
-        if(length(dataNum) == (numDataSetsInPacket * 6))
-            dataNum2 = reshape(dataNum,[6,numDataSetsInPacket]);
-            sensor1Data = userVerifiedFunction(dataNum2(1,:));
-            sensor2Data = userVerifiedFunction(dataNum2(2,:));
-            sensor3Data = userVerifiedFunction(dataNum2(3,:));
-            sensor4Data = userVerifiedFunction(dataNum2(4,:));
-            sensor5Data = userVerifiedFunction(dataNum2(5,:));
-            sensor6Data = userVerifiedFunction(dataNum2(6,:));
-           
-            xData = xcounter+1:(xcounter+numDataSetsInPacket);
+        if(~autoStopPressed)
+            %Convert to an array of numbers
+            dataNum = sscanf(dataStr, '%d,', bytesToRead);
+            if(length(dataNum) == (numDataSetsInPacket * 6)) %Getting weird behavior because this still runs after the auto stop
+                dataNum2 = reshape(dataNum,[6,numDataSetsInPacket]);
+                sensor1Data = userVerifiedFunction(dataNum2(1,:));
+                sensor2Data = userVerifiedFunction(dataNum2(2,:));
+                sensor3Data = userVerifiedFunction(dataNum2(3,:));
+                sensor4Data = userVerifiedFunction(dataNum2(4,:));
+                sensor5Data = userVerifiedFunction(dataNum2(5,:));
+                sensor6Data = userVerifiedFunction(dataNum2(6,:));
 
-            addpoints(uPlotSensor1, xData, sensor1Data);
-            addpoints(uPlotSensor2, xData, sensor2Data);
-            addpoints(uPlotSensor3, xData, sensor3Data);
-            addpoints(uPlotSensor4, xData, sensor4Data);
-            addpoints(uPlotSensor5, xData, sensor5Data);
-            addpoints(uPlotSensor6, xData, sensor6Data);
-            xcounter = xcounter + numDataSetsInPacket;
-            drawnow;
-            
-                exportSensor1Array = ([exportSensor1Array, sensor1Data]); %This will most likely need to be changed
-                exportSensor2Array = ([exportSensor2Array, sensor2Data]);
-                exportSensor3Array = ([exportSensor3Array, sensor3Data]);
-                exportSensor4Array = ([exportSensor4Array, sensor4Data]);
-                exportSensor5Array = ([exportSensor5Array, sensor5Data]);
-                exportSensor6Array = ([exportSensor6Array, sensor6Data]);
+                xData = xcounter+1:(xcounter+numDataSetsInPacket);
+
+                addpoints(uPlotSensor1, xData, sensor1Data);
+                addpoints(uPlotSensor2, xData, sensor2Data);
+                addpoints(uPlotSensor3, xData, sensor3Data);
+                addpoints(uPlotSensor4, xData, sensor4Data);
+                addpoints(uPlotSensor5, xData, sensor5Data);
+                addpoints(uPlotSensor6, xData, sensor6Data);
+                xcounter = xcounter + numDataSetsInPacket;
+                drawnow;
+
+                %We don't want the following to be expensive operations
+                exportSensor1Array = [exportSensor1Array, sensor1Data]; 
+                exportSensor2Array = [exportSensor2Array, sensor2Data];
+                exportSensor3Array = [exportSensor3Array, sensor3Data];
+                exportSensor4Array = [exportSensor4Array, sensor4Data];
+                exportSensor5Array = [exportSensor5Array, sensor5Data];
+                exportSensor6Array = [exportSensor6Array, sensor6Data];
+
+                if(length(exportSensor1Array) >= 10000) %Limiting the length of exportSensorArrays allows for a consistent runtime
+                       %Dump the data into the global cell Array
+                    exportContainer1{1,numExportDataDumps} = exportSensor1Array;
+                    exportContainer2{1,numExportDataDumps} = exportSensor2Array;
+                    exportContainer3{1,numExportDataDumps} = exportSensor3Array;
+                    exportContainer4{1,numExportDataDumps} = exportSensor4Array;
+                    exportContainer5{1,numExportDataDumps} = exportSensor5Array;
+                    exportContainer6{1,numExportDataDumps} = exportSensor6Array;
+                    exportSensor1Array = [];
+                    exportSensor2Array = [];
+                    exportSensor3Array = [];
+                    exportSensor4Array = [];
+                    exportSensor5Array = [];
+                    exportSensor6Array = [];
+                    numExportDataDumps = numExportDataDumps + 1;
+                    disp('Dumped export Data')
+                end
+            end
         end
     end
     
-    if(~autoStopPressed)
+    if(~autoStopPressed) %If this is true that we don't want to run
         t2 = clock;
-        if (etime(t2,t1) > secondsBetweenFlushes)
-            flushinput(udpClient);
+        if (etime(t2,t1) > secondsBetweenFlushes) %Every so often flush the input data to keep the graph from becoming laggy
+            flushinput(udpClient); 
             disp('Flushed and Reset Clock');
             t1 = clock;
         end 
@@ -736,6 +775,12 @@ end
 function autoStop_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of autoStop
 %TODO: update this and the create function
+     global autoStop;
+     if(get(hObject, 'Value') == 0)
+        autoStop = false;
+     else
+         autoStop = true;
+     end
 end
 
 
@@ -744,6 +789,6 @@ function autoStop_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to autoStop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-global autoStop;
-autoStop = true;
+    global autoStop;
+    autoStop = true;
 end
