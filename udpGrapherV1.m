@@ -689,10 +689,10 @@ function excel_export_Callback(hObject, eventdata, handles)
         num_lines = 1;
         defaultans = {'foot_sensor_data_1'};
         answer = inputdlg(prompt, dlg_title,num_lines, defaultans);
-        filename = answer{1,1};
         
         if(~isempty(answer) && ~isempty(s1))
             disp('Exporting To Excel');
+            filename = answer{1,1};
             disp(filename);
            
             try
