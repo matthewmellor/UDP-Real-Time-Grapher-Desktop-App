@@ -874,3 +874,13 @@ function autoStop_CreateFcn(hObject, eventdata, handles)
     global autoStop;
     autoStop = true;
 end
+
+
+% --- Executes during object creation, after setting all properties.
+function valuesTable_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to valuesTable (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global valuesTable;
+valuesTable = hObject;
+end 
