@@ -603,31 +603,32 @@ function csv_Callback(hObject, eventdata, handles)
 end
 
 function excel_export_Callback(hObject, eventdata, handles)
-    global exportSensor1Array;
-    global exportSensor2Array;
-    global exportSensor3Array;
-    global exportSensor4Array;
-    global exportSensor5Array;
-    global exportSensor6Array;
+    global exportContainer1;
+    global exportContainer2;
+    global exportContainer3;
+    global exportContainer4;
+    global exportContainer5;
+    global exportContainer6;
     
     %Need to ensure that the graph is stopped when this is pressed
     %TODO
+
+    s1 = transpose([exportContainer1{:}]);
+    s2 = transpose([exportContainer2{:}]);
+    s3 = transpose([exportContainer3{:}]);
+    s4 = transpose([exportContainer4{:}]);
+    s5 = transpose([exportContainer5{:}]);
+    s6 = transpose([exportContainer6{:}]);
     
-    s1 = transpose(exportSensor1Array);
-    s2 = transpose(exportSensor2Array);
-    s3 = transpose(exportSensor3Array);
-    s4 = transpose(exportSensor4Array);
-    s5 = transpose(exportSensor5Array);
-    s6 = transpose(exportSensor6Array);
-    
-    display('Exporting To Excel');
-    filename = 'graphTest1.xlsx'; %Need to implement a way for users to input a TitleName
+    disp('Exporting To Excel');
+    filename = 'graphTest3.xlsx'; %Need to implement a way for users to input a TitleName
     xlswrite(filename,s1,1,'A1');
     xlswrite(filename,s2,1,'B1');
     xlswrite(filename,s3,1,'C1');
     xlswrite(filename,s4,1,'D1');
     xlswrite(filename,s5,1,'E1');
     xlswrite(filename,s6,1,'F1');
+    disp('Done Exporting');
     
     clear exportSensor1Array; %When to do this needs to be figured out...
     clear exportSensor2Array; %Maybe there should be a reset button?????
@@ -717,47 +718,47 @@ function help_button_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in pushbutton10.
-function pushbutton10_Callback(hObject, eventdata, handles)
+% --- Executes on button press in reset_all_button.
+function reset_all_button_Callback(hObject, eventdata, handles)
 end
 
 
-function edit11_Callback(hObject, eventdata, handles)
-% Hints: get(hObject,'String') returns contents of edit11 as text
-%        str2double(get(hObject,'String')) returns contents of edit11 as a double
+function data_sets_per_package_Callback(hObject, eventdata, handles)
+% Hints: get(hObject,'String') returns contents of data_sets_per_package as text
+%        str2double(get(hObject,'String')) returns contents of data_sets_per_package as a double
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit11_CreateFcn(hObject, eventdata, handles)
+function data_sets_per_package_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 end
 
-function edit12_Callback(hObject, eventdata, handles)
-% hObject    handle to edit12 (see GCBO)
+function x_axis_edit_length_Callback(hObject, eventdata, handles)
+% hObject    handle to x_axis_edit_length (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit12 as text
-%        str2double(get(hObject,'String')) returns contents of edit12 as a double
+% Hints: get(hObject,'String') returns contents of x_axis_edit_length as text
+%        str2double(get(hObject,'String')) returns contents of x_axis_edit_length as a double
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit12_CreateFcn(hObject, eventdata, handles)
+function x_axis_edit_length_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
 end
 
-function edit13_Callback(hObject, eventdata, handles)
+function y_axis_edit_legth_Callback(hObject, eventdata, handles)
 
-% Hints: get(hObject,'String') returns contents of edit13 as text
-%        str2double(get(hObject,'String')) returns contents of edit13 as a double
+% Hints: get(hObject,'String') returns contents of y_axis_edit_legth as text
+%        str2double(get(hObject,'String')) returns contents of y_axis_edit_legth as a double
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit13_CreateFcn(hObject, eventdata, handles)
+function y_axis_edit_legth_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
