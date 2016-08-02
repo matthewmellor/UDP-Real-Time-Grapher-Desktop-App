@@ -634,8 +634,6 @@ function setButton_Callback(hObject, eventdata, handles)
 end
 
 %--------------------TOOLBAR Code--------------------------
-function csv_Callback(hObject, eventdata, handles)
-end
 
 function excel_export_Callback(hObject, eventdata, handles)
     global exportContainer1;
@@ -730,8 +728,7 @@ function excel_export_Callback(hObject, eventdata, handles)
     
 end
 
-function export_csv_Callback(hObject, eventdata, handles)
-end
+
 
 %---------------USER EQUATION INPUT CODE ------------------
 function edit_equation_CreateFcn(hObject, eventdata, handles)
