@@ -698,6 +698,7 @@ function excel_export_Callback(hObject, eventdata, handles)
         num_lines = 1;
         defaultans = {'foot_sensor_data_1'};
         answer = inputdlg(prompt, dlg_title,num_lines, defaultans);
+        success = true;
         
         if(~isempty(answer) && ~isempty(s1))
             disp('Exporting To Excel');
@@ -714,6 +715,12 @@ function excel_export_Callback(hObject, eventdata, handles)
                 disp('Done Exporting');
             catch
                 disp('Couldnt export the data');
+                success = false;
+            end
+            if(success)
+                msgbox('Export Completed.');
+            else 
+                msgbox('Export Failed');
             end
             dataBeenExported = true; %Wait until done exporting for Operations to begin again (I need a blocking command)
             dataCurrentlyExporting = false;
