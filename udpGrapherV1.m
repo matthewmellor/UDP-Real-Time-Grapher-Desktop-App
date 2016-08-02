@@ -165,7 +165,7 @@ function startbutton_Callback(hObject, eventdata, handles)
         startBeenPressed = true;
         everStarted = true;
         
-        if(dataBeenExported)
+        if(dataBeenExported || stopBeenPressed)
            %Clear the exportData 
             exportContainer1 = {};
             exportContainer2 = {};
@@ -242,8 +242,6 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global exportContainer5;
     global exportContainer6;
     global numExportDataDumps;
-    global valuesTable;
-    global setValuesTable;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
@@ -307,7 +305,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                 exportSensor5Array = [exportSensor5Array, sensor5Data];
                 exportSensor6Array = [exportSensor6Array, sensor6Data];
 
-                if(length(exportSensor1Array) >= 10000) %Limiting the length of exportSensorArrays allows for a consistent runtime
+                if(length(exportSensor1Array) >= 50000) %Limiting the length of exportSensorArrays allows for a consistent runtime
                        %Dump the data into the global cell Array
                     exportContainer1{1,numExportDataDumps} = exportSensor1Array;
                     exportContainer2{1,numExportDataDumps} = exportSensor2Array;
@@ -329,7 +327,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
         end
     end
     
-    if(~autoStopPressed) %If this is true that we don't want to run
+    if(~autoStopPressed && startBeenPressed) %Add a catch for excel export stopping
         t2 = clock;
         if (etime(t2,t1) > secondsBetweenFlushes) %Every so often flush the input data to keep the graph from becoming laggy
             flushinput(udpClient); 
@@ -368,6 +366,7 @@ function figure1_DeleteFcn(hObject, eventdata, handles)
         fclose(udpClient);
         delete(udpClient);
         clear udpClient;
+        clear all;
         fclose(instrfindall);
     end
 end
@@ -655,7 +654,7 @@ function excel_export_Callback(hObject, eventdata, handles)
         startBeenPressed = false;
         stopBeenPressed = true;
         xcounter = 0;
-        flushinput(udpClient);
+        %flushinput(udpClient);
         fclose(udpClient);
         delete(udpClient);
         clear udpClient;
@@ -828,6 +827,10 @@ function x_axis_edit_length_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of x_axis_edit_length as text
 %        str2double(get(hObject,'String')) returns contents of x_axis_edit_length as a double
+ global xAxisLength;
+ global xAxisLengthValueHandle;
+ xAxisLength = get(hObject, 'String');
+ xAxisLengthValueHandle = hObject;
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -835,12 +838,23 @@ function x_axis_edit_length_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+    
+ global xAxisLength;
+ global xAxisLengthValueHandle;
+ xAxisLength = get(hObject, 'String');
+ xAxisLengthValueHandle = hObject;
+    
 end
 
 function y_axis_edit_legth_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of y_axis_edit_legth as text
 %        str2double(get(hObject,'String')) returns contents of y_axis_edit_legth as a double
+global yAxisLength;
+global yAxisLengthValueHandle;
+yAxisLength = (get(hObject,'String')); %Need to check if this isn't a number...
+yAxisLengthValueHandle = hObject; %So you can change the color if it is wrong...
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -851,6 +865,11 @@ function y_axis_edit_legth_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+    
+global yAxisLength;
+global yAxisLengthValueHandle;
+yAxisLength = (get(hObject,'String')); %Need to check if this isn't a number...
+yAxisLengthValueHandle = hObject; 
 end
 
 % --------------------------------------------------------------------
@@ -881,18 +900,6 @@ function autoStop_CreateFcn(hObject, eventdata, handles)
 end
 
 
-% --- Executes during object creation, after setting all properties.
-function valuesTable_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to valuesTable (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-global valuesTable;
-global setValuesTable;
-valuesTable = hObject; %There is a reference to the object... How do we set the values?
-setValuesTable = 0;
-end 
-
-
 
 function edit_graph_title_Callback(hObject, eventdata, handles)
 % hObject    handle to edit_graph_title (see GCBO)
@@ -901,6 +908,9 @@ function edit_graph_title_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit_graph_title as text
 %        str2double(get(hObject,'String')) returns contents of edit_graph_title as a double
+global graphTitle;
+graphTitle = get(hObject, 'String');
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -914,6 +924,9 @@ function edit_graph_title_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+global graphTitle;
+graphTitle = 'Sensor Values Vs. Number of Samples';
 end
 
 
@@ -924,6 +937,8 @@ function edit_y_axis_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit_y_axis as text
 %        str2double(get(hObject,'String')) returns contents of edit_y_axis as a double
+global yAxisLabel;
+yAxisLabel = get(hObject, 'String');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -937,21 +952,26 @@ function edit_y_axis_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+global yAxisLabel;
+yAxisLabel = 'Sensor Values';
 end
 
 
-function edit16_Callback(hObject, eventdata, handles)
-% hObject    handle to edit16 (see GCBO)
+function xAxisLabelEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to xAxisLabelEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit16 as text
-%        str2double(get(hObject,'String')) returns contents of edit16 as a double
+% Hints: get(hObject,'String') returns contents of xAxisLabelEdit as text
+%        str2double(get(hObject,'String')) returns contents of xAxisLabelEdit as a double
+global xAxisLabel;
+xAxisLabel = get(hObject, 'String');
 end
 
 % --- Executes during object creation, after setting all properties.
-function edit16_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit16 (see GCBO)
+function xAxisLabelEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to xAxisLabelEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -960,11 +980,89 @@ function edit16_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+global xAxisLabel;
+xAxisLabel = 'Number of Samples';
+
 end
 
-% --- Executes on button press in pushbutton11.
-function pushbutton11_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton11 (see GCBO)
+% --- Executes on button press in apply_graph_button.
+function apply_graph_button_Callback(hObject, eventdata, handles)
+% hObject    handle to apply_graph_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+%First add the condition that this will only work if start is off
+global startBeenPressed;
+global graphTitle;
+global yAxisLabel;
+global yAxisLength;
+global yAxisLengthValueHandle;
+global xAxisLabel;
+global xAxisLength;
+global xAxisLengthValueHandle;
+global axesHandle;
+global xlimit;
+global graphLabelHandle;
+global editXAxisLabelHandle;
+    if(~startBeenPressed)
+        set(graphLabelHandle,'String', graphTitle);
+        axesHandle.YLabel.String = yAxisLabel;
+        set(editXAxisLabelHandle, 'String', xAxisLabel);
+       
+        if(isempty(regexp(yAxisLength, '\D', 'ONCE')))
+           yAxisVal = str2double(yAxisLength);
+           if(yAxisVal ~= 0)
+               axesHandle.YLim = [0 yAxisVal]; %what happens if this is neg?
+               set(yAxisLengthValueHandle, 'BackgroundColor', [1 1 1]);
+           end
+        else
+            disp('bad y axis length')
+            set(yAxisLengthValueHandle, 'BackgroundColor', [1 0.9 0.9]);
+        end
+        
+        if(isempty(regexp(xAxisLength, '\D', 'ONCE')) )
+            xAxisVal = str2double(xAxisLength);
+            if(xAxisVal ~= 0)
+                xlimit = xAxisVal; %what happens if this is neg?
+                axesHandle.XLim = [0 xlimit];
+                set(xAxisLengthValueHandle, 'BackgroundColor', [1 1 1]);
+            end
+        else 
+            disp('bad y axis length');
+            set(xAxisLengthValueHandle, 'BackgroundColor', [1 0.9 0.9]);
+        end
+    end
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function axes4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axes4
+ global axesHandle;
+ axesHandle = hObject;
+ axesHandle.YLabel.String = 'Sensor Values';
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function editXAxisLabel_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editXAxisLabel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global editXAxisLabelHandle;
+editXAxisLabelHandle = hObject;
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function text18_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to text18 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+global graphLabelHandle;
+graphLabelHandle = hObject;
 end
