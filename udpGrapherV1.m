@@ -811,11 +811,7 @@ end
 % --- Executes on button press in help_button.
 function help_button_Callback(hObject, eventdata, handles)
     %TODO bring up popup about syntax
-end
-
-
-% --- Executes on button press in reset_all_button.
-function reset_all_button_Callback(hObject, eventdata, handles)
+    h = msgbox('Correct Syntax for the equation box includes any valid matlab function that utilizes x', 'Help');
 end
 
 
@@ -891,6 +887,11 @@ end
 
 % --------------------------------------------------------------------
 function help_Callback(hObject, eventdata, handles)
+
+    %TODO Add a long message here to help people debug why their program
+    %isn't working...
+    h = msgbox('Common problems...TODO','Help');
+
 end
 
 
