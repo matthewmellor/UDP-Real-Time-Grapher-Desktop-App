@@ -242,6 +242,8 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global exportContainer5;
     global exportContainer6;
     global numExportDataDumps;
+    global valuesTable;
+    global setValuesTable;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
@@ -293,6 +295,8 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                 addpoints(uPlotSensor5, xData, sensor5Data);
                 addpoints(uPlotSensor6, xData, sensor6Data);
                 xcounter = xcounter + numDataSetsInPacket;
+               
+                
                 drawnow;
 
                 %We don't want the following to be expensive operations
@@ -320,6 +324,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                     numExportDataDumps = numExportDataDumps + 1;
                     disp('Dumped export Data')
                 end
+                
             end
         end
     end
@@ -882,5 +887,7 @@ function valuesTable_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 global valuesTable;
-valuesTable = hObject;
+global setValuesTable;
+valuesTable = hObject; %There is a reference to the object... How do we set the values?
+setValuesTable = 0;
 end 
