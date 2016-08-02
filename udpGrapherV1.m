@@ -68,6 +68,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     global dataCurrentlyExporting;
     global dataBeenExported;
     global graphingHasOccured;
+    global numFuncCalls;
   
     xlimit = 50000;
     numDataSetsInPacket = 45; %Change this value if needed = # sets of data in a packet
@@ -99,6 +100,7 @@ function udpGrapherV1_OpeningFcn(hObject, eventdata, handles, varargin)
     dataCurrentlyExporting = false;
     dataBeenExported = false;
     graphingHasOccured = false;
+    numFuncCalls = 0;
     
     % Choose default command line output for udpGrapherV1
     handles.output = hObject;
@@ -146,8 +148,10 @@ function startbutton_Callback(hObject, eventdata, handles)
     global exportContainer5;
     global exportContainer6;
     global numExportDataDumps;
+    global dataSetsPerPacket;
     
     validIP = true;
+    
     
     if(~startBeenPressed && ~dataCurrentlyExporting) %Nothing will happen if data is currently exporting
         if(stopBeenPressed)
@@ -164,6 +168,7 @@ function startbutton_Callback(hObject, eventdata, handles)
         
         startBeenPressed = true;
         everStarted = true;
+        numDataSetsInPacket = dataSetsPerPacket; %only gets changed when start pressed
         
         if(dataBeenExported || stopBeenPressed)
            %Clear the exportData 
@@ -242,6 +247,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
     global exportContainer5;
     global exportContainer6;
     global numExportDataDumps;
+    global numFuncCalls;
     
     data = fread(udpClient,bytesToRead);
     dataStr = char(data(1:end-2)'); %Convert to an array
@@ -294,9 +300,11 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                 addpoints(uPlotSensor6, xData, sensor6Data);
                 xcounter = xcounter + numDataSetsInPacket;
                
-                
-                drawnow;
-
+                if(numFuncCalls == 2)
+                    drawnow;
+                    numFuncCalls = 0;
+                end
+                numFuncCalls = numFuncCalls + 1;
                 %We don't want the following to be expensive operations
                 exportSensor1Array = [exportSensor1Array, sensor1Data]; 
                 exportSensor2Array = [exportSensor2Array, sensor2Data];
@@ -305,7 +313,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                 exportSensor5Array = [exportSensor5Array, sensor5Data];
                 exportSensor6Array = [exportSensor6Array, sensor6Data];
 
-                if(length(exportSensor1Array) >= 50000) %Limiting the length of exportSensorArrays allows for a consistent runtime
+                if(length(exportSensor1Array) >= 10000) %Limiting the length of exportSensorArrays allows for a consistent runtime
                        %Dump the data into the global cell Array
                     exportContainer1{1,numExportDataDumps} = exportSensor1Array;
                     exportContainer2{1,numExportDataDumps} = exportSensor2Array;
@@ -320,9 +328,8 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                     exportSensor5Array = [];
                     exportSensor6Array = [];
                     numExportDataDumps = numExportDataDumps + 1;
-                    disp('Dumped export Data')
+                    disp('Dumped export Data');
                 end
-                
             end
         end
     end
@@ -758,7 +765,7 @@ function applyEquation_Callback(hObject, eventdata, handles)
     global userUnVerifiedFunction;
     global userVerifiedFunction;
     global userDefinedAFunction;
-    global userFunctionFieldHandle; %Should I vectorize the equation???
+    global userFunctionFieldHandle; 
     global userEQString;
     x = [1,2,3];
     equationWasValid = true;
@@ -811,6 +818,9 @@ end
 function data_sets_per_package_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of data_sets_per_package as text
 %        str2double(get(hObject,'String')) returns contents of data_sets_per_package as a double
+
+    global dataSetsPerPacket;
+    dataSetsPerPacket = str2double(get(hObject, 'String'));
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -818,6 +828,9 @@ function data_sets_per_package_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
+    global dataSetsPerPacket;
+    dataSetsPerPacket = 45;
+    
 end
 
 function x_axis_edit_length_Callback(hObject, eventdata, handles)
