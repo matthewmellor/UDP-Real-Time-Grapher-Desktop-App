@@ -300,7 +300,7 @@ function localReadAndPlot(udpClient,~,uPlotSensor1,uPlotSensor2,uPlotSensor3,uPl
                 addpoints(uPlotSensor6, xData, sensor6Data);
                 xcounter = xcounter + numDataSetsInPacket;
                
-                if(numFuncCalls == 2)
+                if(numFuncCalls == 1)
                     drawnow;
                     numFuncCalls = 0;
                 end
