@@ -390,7 +390,6 @@ function autoStop_CreateFcn(hObject, eventdata, handles)
     autoStop = true;
 end
 
-
 %%-------------CheckBox Code/ Graph Toggling ------------------------------
 
 % --- Executes during object creation, after setting all properties.
@@ -403,24 +402,20 @@ function checkbox2_CreateFcn(hObject, eventdata, handles) %#ok<*DEFNU>
     set(hObject,'Value',1);
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function checkbox3_CreateFcn(hObject, eventdata, handles)
     set(hObject,'Value',1);
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function checkbox4_CreateFcn(hObject, eventdata, handles)
     set(hObject,'Value',1);
 end
 
-
 % --- Executes during object creation, after setting all properties.
 function checkbox5_CreateFcn(hObject, eventdata, handles)
     set(hObject,'Value',1);
 end
-
 
 % --- Executes during object creation, after setting all properties.
 function checkbox6_CreateFcn(hObject, eventdata, handles)
@@ -680,8 +675,23 @@ function help_Callback(hObject, eventdata, handles)
 
     %TODO Add a long message here to help people debug why their program
     %isn't working...
-    h = msgbox('Graph not displaying anything','Help');
-    %TODO
+    h1 = sprintf('Common issues \n1.Nothing is graphing');
+    h2 = sprintf('   Check the following:');
+    h3 = sprintf('       A. Udp Connection');
+    h4 = sprintf('       B. Graph Limits too small');
+    h5 = sprintf('');
+    h6 = sprintf('   UDP Connection Issues:');
+    h7 = sprintf('      1. Double Check');
+    h8 = sprintf('              Remote Server IP Address/Hostname');
+    h9 = sprintf('              Remote Port');
+    h10 = sprintf('              Local Port');
+    h11 = sprintf('      2. Data Packets');
+    h12 = sprintf('             Is your remote server packaging the data correctly?');
+    h13 = sprintf('             Convention used is 6 comma seperated values per data set');
+    h14 = sprintf('             Last data set must terminate in newline character');
+    h15 = sprintf('             and not a comma');
+    h = msgbox({h1,h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14, h15},'Help');
+    
 end
 
 %----------------UDP Parameters Code ------------------------------------
@@ -1039,5 +1049,3 @@ function text18_CreateFcn(hObject, eventdata, handles)
     global graphLabelHandle;
     graphLabelHandle = hObject;
 end
-
-
