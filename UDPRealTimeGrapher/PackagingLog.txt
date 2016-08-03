@@ -1,0 +1,29 @@
+ant:
+<ant>
+  <mkdir dir="C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_redistribution" />
+  <mkdir dir="C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_testing" />
+  <mkdir dir="C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_redistribution_files_only" />
+</ant>
+mcc -C -o UDPRealTimeGrapher -W WinMain:UDPRealTimeGrapher -T link:exe -d C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_testing -v C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\udpGrapherV1.m 
+Compiler version: 5.2 (R2014b)
+Dependency analysis by REQUIREMENTS.
+[Warning: Adding path
+"C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp"
+to Compiler path instance.] 
+Parsing file "C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\udpGrapherV1.m"
+	(Referenced from: "Compiler Command Line").
+Deleting 6 temporary MEX authorization files.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_19617_6688.auth'.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_24563_6688.auth'.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_22077_6688.auth'.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_27275_6688.auth'.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_28750_6688.auth'.
+Removing: 'C:\Users\Matthew\AppData\Local\Temp\mathworks_tmp_6688_24178_6688.auth'.
+Generating file "C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_testing\readme.txt".
+Packaging...
+Adding custom icon C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher_resources\icon.ico to C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_testing\UDPRealTimeGrapher.exe.
+Attempting to embed the CTF archive into the application C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_testing\UDPRealTimeGrapher.exe.
+Finished embedding CTF archive. Deleting the external CTF archive.
+Creating the bundle...
+Web based installer created at C:\Users\Matthew\Documents\Summer-UROP\UDP-Matlab-APP-Github\udpRealTimeGrapherMatlabApp\UDPRealTimeGrapher\for_redistribution\MyAppInstaller_web.exe.
+Packaging complete.
